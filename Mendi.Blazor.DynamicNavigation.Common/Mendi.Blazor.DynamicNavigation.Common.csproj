@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<Title>Mendi.Blazor.DynamicNavigation.Common</Title>
+		<Authors>Daniel Mendie</Authors>
+		<Description>Contains decorators, helpers and utilities for DynamicNavigation</Description>
+		<Copyright>2024</Copyright>
+		<PackageProjectUrl>https://www.nuget.org/packages/Mendi.Blazor.DynamicNavigation.Common</PackageProjectUrl>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<RepositoryUrl>https://github.com/danielmendie/Mendi.Blazor.DynamicNavigation</RepositoryUrl>
+		<PackageTags>Library</PackageTags>
+		<PackageLicenseFile>LICENSE</PackageLicenseFile>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <None Include="..\LICENSE">
+	    <Pack>True</Pack>
+	    <PackagePath>\</PackagePath>
+	  </None>
+	  <None Include="..\README.md">
+	    <Pack>True</Pack>
+	    <PackagePath>\</PackagePath>
+	  </None>
+	</ItemGroup>
+
+</Project>
