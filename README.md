@@ -15,7 +15,7 @@ To begin, install the **Mendi.Blazor.DynamicNavigation** Nuget package from Visu
 
 ## 🔧Configuration
 Open your project's **Program.cs** file and replace this section ```await builder.RunAsync()``` with
-``` csharp
+```csharp
 var app = await builder.UseDynamicNavigator();
 await app.RunAsync();
 ```
