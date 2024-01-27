@@ -79,7 +79,7 @@ namespace Test.Pages.SampleHere
 
 **NavigatorClickEvent** - This attribute requires one parameter; gotoComponent(string: the name of the next routable component to navigate to). This attribute should be applied to EventCallback properties.
 
-And here's what the `Calculator.razor.cs` file would like
+And here's what the `Calculator.razor.cs` file would look like
 ``` csharp
 using Mendi.Blazor.DynamicNavigation.Common;
 using Microsoft.AspNetCore.Components;
@@ -108,6 +108,8 @@ namespace Test.Pages.HiJack
 ```
 
 Once your routable components are decorated. The rest is up to **Mendi.Blazor.DynamicNavigation.CLI** tool to complete😉
+
+
 
 > # Mendi.Blazor.DynamicNavigation.CLI
 >>Command line tool for generating page routes and building routes for the dynamic navigation use in your application
