@@ -9,8 +9,8 @@
 - [x] Multi-App Switching - *Switch between multiple apps within your project. This is very useful for controlling the UI*
 
 ## 📖Installation
-```To begin, install the **Mendi.Blazor.DynamicNavigation** Nuget package into your project from Visual Studio or use the CLI: `dotnet add package Mendi.Blazor.DynamicNavigation` 
-```
+To begin, install the **Mendi.Blazor.DynamicNavigation** Nuget package into your project from Visual Studio or use the CLI: `dotnet add package Mendi.Blazor.DynamicNavigation` 
+
 
 ## 🔧Configuration
 Open your project's **Program.cs** file and replace this section ```await builder.RunAsync()``` with
