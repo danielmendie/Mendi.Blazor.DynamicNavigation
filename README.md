@@ -19,6 +19,23 @@ Open your project's **Program.cs** file and replace this section ```await builde
 var app = await builder.UseDynamicNavigator();
 await app.RunAsync();
 ```
+Now create a `BaseComponent.cs` class in the pages folder or wherever it would be convenient for you. You can change the `BaseComponent.cs` name of course.
+You'll have to inherit the `DynamicNavigatorComponentBase` class and add the `NavigatorBaseComponent` attribute. Your class should look similar to this:
+```csharp
+using Mendi.Blazor.DynamicNavigation;
+using Mendi.Blazor.DynamicNavigation.Common;
+
+
+namespace Test.Pages;
+[NavigatorBaseComponent]
+public class BaseComponent : DynamicNavigatorComponentBase
+{
+
+}
+```
+The `NavigatorBaseComponent` attribute should be specified on the class acting as your component base class - **Important**
+
+
 
 > # Mendi.Blazor.DynamicNavigation.CLI
 >>Command line tool for generating page routes and building routes for the dynamic navigation use in your application
