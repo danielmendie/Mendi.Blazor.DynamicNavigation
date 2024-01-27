@@ -66,10 +66,10 @@ namespace Mendi.Blazor.DynamicNavigation.CLI
         {
             try
             {
-                var configFilePath = GetBaseComponetDefault(filePath, "TrueSPA.config");
+                var configFilePath = GetBaseComponetDefault(filePath, "DynamicNavigator.config");
                 if (configFilePath == null)
                 {
-                    Console.WriteLine(">>> 'TrueSPA.config' file not found in project directory.");
+                    Console.WriteLine(">>> 'DynamicNavigator.config' file not found in project directory.");
                     return null;
                 }
 
