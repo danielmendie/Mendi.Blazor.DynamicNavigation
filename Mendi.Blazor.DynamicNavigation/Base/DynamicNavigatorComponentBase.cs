@@ -7,6 +7,8 @@ namespace Mendi.Blazor.DynamicNavigation
         [Inject] protected private NavigationManager NavigationManager { get; set; } = null!;
         [Inject] public IndexedDbAccessor IndexedDbAccessor { get; set; } = null!;
 
+        private List<NavigatorHistory> NavigationHistory = [];
+
 
         /// <summary>
         /// Constructs an instance of <see cref="DynamicNavigatorComponentBase"/>.
@@ -69,9 +71,35 @@ namespace Mendi.Blazor.DynamicNavigation
         /// This is intended to behave like a browser's back button feature
         /// </summary>
         /// <exception cref="NotImplementedException"></exception>
-        public virtual void OnBackToPreviousPageClicked()
+        public virtual async Task<DynamicNavigatorContainer> OnBackToPreviousPageClicked(DynamicNavigatorContainer container, DynamicNavigatorRegistry registry, Type callingComponent)
         {
-            throw new NotImplementedException();
+            if (NavigationHistory.Count > 1)
+            {
+                try
+                {
+                    NavigationHistory.RemoveAt(NavigationHistory.Count - 1);
+                    var previousPage = NavigationHistory[NavigationHistory.Count - 1];
+
+                    if (previousPage.Params != null && previousPage.Params.Any())
+                    {
+                        foreach (var item in previousPage.Params)
+                        {
+                            registry.ApplicationRoutes[$"{previousPage.Page}"].ComponentParameters[item.Key] = item.Value;
+                        }
+                    }
+
+                    var comInfo = registry.ApplicationRoutes[$"{previousPage.Page}"];
+                    container = new DynamicNavigatorContainer { CurrentPageRoute = callingComponent.Assembly.GetType(comInfo.ComponentPath) };
+                    DynamicNavigatorRoute SinglePageRoute = new() { AppId = comInfo.AppId, AppName = comInfo.AppName, Component = previousPage.Page, Params = previousPage.Params ?? [] };
+                    await IndexDbAddValue(IndexDbKeyTypes.Page, SinglePageRoute);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.ToString());
+                }
+            }
+
+            return container;
         }
 
         /// <summary>
@@ -83,12 +111,11 @@ namespace Mendi.Blazor.DynamicNavigation
         /// <param name="page"></param>
         /// <param name="callingComponent"></param>
         /// <returns></returns>
-        public virtual async Task<DynamicNavigatorContainer> OnPageItemClicked(Dictionary<string, string> parameters, string page, DynamicNavigatorRegistry registry, Type callingComponent)
+        public virtual async Task<DynamicNavigatorContainer> OnPageItemClicked(Dictionary<string, string> parameters, string page, DynamicNavigatorContainer container, DynamicNavigatorRegistry registry, Type callingComponent)
         {
-            DynamicNavigatorContainer Container = new();
             try
             {
-                if (parameters.Any())
+                if (parameters != null && parameters.Any())
                 {
                     foreach (var item in parameters)
                     {
@@ -97,16 +124,20 @@ namespace Mendi.Blazor.DynamicNavigation
                 }
 
                 var comInfo = registry.ApplicationRoutes[$"{page}"];
-                Container = new DynamicNavigatorContainer { CurrentPageRoute = callingComponent.Assembly.GetType(comInfo.ComponentPath) };
-                DynamicNavigatorRoute SinglePageRoute = new() { AppId = comInfo.AppId, AppName = comInfo.AppName, Component = page, Params = parameters };
+                container = new DynamicNavigatorContainer { CurrentPageRoute = callingComponent.Assembly.GetType(comInfo.ComponentPath) };
+                DynamicNavigatorRoute SinglePageRoute = new() { AppId = comInfo.AppId, AppName = comInfo.AppName, Component = page, Params = parameters ?? [] };
                 await IndexDbAddValue(IndexDbKeyTypes.Page, SinglePageRoute);
+
+                var history = new NavigatorHistory { Page = page, Params = parameters ?? [] };
+                if (NavigationHistory.Count == 0 || NavigationHistory[^1] != history)
+                    NavigationHistory.Add(history);
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.ToString());
             }
 
-            return Container;
+            return container;
         }
 
         /// <summary>
@@ -115,17 +146,20 @@ namespace Mendi.Blazor.DynamicNavigation
         /// </summary>
         /// <param name="pageComponentName"></param>
         /// <param name="callingComponent"></param>
-        public virtual async Task<DynamicNavigatorContainer> OnNavMenuItemCliked(string pageComponentName, DynamicNavigatorRegistry registry, Type callingComponent)
+        public virtual async Task<DynamicNavigatorContainer> OnNavMenuItemCliked(string pageComponentName, DynamicNavigatorContainer container, DynamicNavigatorRegistry registry, Type callingComponent)
         {
-            DynamicNavigatorContainer Container = new();
             if (!string.IsNullOrWhiteSpace(pageComponentName) && callingComponent is not null)
             {
                 try
                 {
                     var comInfo = registry.ApplicationRoutes[$"{pageComponentName}"];
-                    Container = new DynamicNavigatorContainer { CurrentPageRoute = callingComponent.Assembly.GetType(comInfo.ComponentPath) };
+                    container = new DynamicNavigatorContainer { CurrentPageRoute = callingComponent.Assembly.GetType(comInfo.ComponentPath) };
                     DynamicNavigatorRoute SinglePageRoute = new() { AppId = comInfo.AppId, AppName = comInfo.AppName, Component = pageComponentName };
                     await IndexDbAddValue(IndexDbKeyTypes.Page, SinglePageRoute);
+
+                    var history = new NavigatorHistory { Page = pageComponentName, Params = [] };
+                    if (NavigationHistory.Count == 0 || NavigationHistory[^1] != history)
+                        NavigationHistory.Add(history);
                 }
                 catch (Exception ex)
                 {
@@ -133,7 +167,7 @@ namespace Mendi.Blazor.DynamicNavigation
                 }
             }
 
-            return Container;
+            return container;
         }
 
         /// <summary>

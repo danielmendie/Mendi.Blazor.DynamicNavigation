@@ -258,6 +258,7 @@ namespace Mendi.Blazor.DynamicNavigation.CLI
                 CreatePageRouteContainer(basePath);
                 CreatePageRouteRegistry(basePath);
                 CreateSinglePageRoute(basePath);
+                await CreateOnBackToPreviousPageClicked(basePath, path);
                 await CreateOnMapNavMenuClicked(basePath, path);
                 await CreateOnMapPageItemClicked(basePath, path);
                 SaveGeneratedRoutes(sb.ToString(), basePath);
@@ -291,6 +292,7 @@ namespace Mendi.Blazor.DynamicNavigation.CLI
                     }
                 }
 
+                if (startIndex != -1) return;
                 if (startIndex != -1)
                 {
                     // Find the real ending brace of the GetPageRoutes method
@@ -316,7 +318,7 @@ namespace Mendi.Blazor.DynamicNavigation.CLI
                 StringBuilder newMethodCode = new StringBuilder();
                 newMethodCode.AppendLine("public async Task OnMapNavMenuClicked(string page)");
                 newMethodCode.AppendLine("{");
-                newMethodCode.AppendLine($"  PageRouteContainer = await OnNavMenuItemCliked(page, PageRouteRegistry, typeof({className}));");
+                newMethodCode.AppendLine($"  PageRouteContainer = await OnNavMenuItemCliked(page, PageRouteContainer, PageRouteRegistry, typeof({className}));");
                 newMethodCode.AppendLine("}");
 
                 if (startIndex != -1)
@@ -361,6 +363,7 @@ namespace Mendi.Blazor.DynamicNavigation.CLI
                     }
                 }
 
+                if (startIndex != -1) return;
                 if (startIndex != -1)
                 {
                     // Find the real ending brace of the GetPageRoutes method
@@ -392,7 +395,84 @@ namespace Mendi.Blazor.DynamicNavigation.CLI
                 StringBuilder newMethodCode = new StringBuilder();
                 newMethodCode.AppendLine("public async Task OnMapPageItemClicked(Dictionary<string, string> parameters, string nextPage)");
                 newMethodCode.AppendLine("{");
-                newMethodCode.AppendLine($"  PageRouteContainer = await OnPageItemClicked(parameters, nextPage, PageRouteRegistry, typeof({className}));");
+                newMethodCode.AppendLine($"  PageRouteContainer = await OnPageItemClicked(parameters, nextPage, PageRouteContainer, PageRouteRegistry, typeof({className}));");
+                newMethodCode.AppendLine("}");
+
+                if (startIndex != -1)
+                {
+                    // Insert the new method code
+                    lines = lines.Take(insertIndex).Concat(newMethodCode.ToString().Split('\n')).Concat(lines.Skip(insertIndex)).ToArray();
+                }
+                else
+                {
+                    lines = lines.Take(lines.Length - 1).Concat(newMethodCode.ToString().Split('\n')).Concat(new[] { "}" }).ToArray();
+                }
+
+                // Write the modified content back to the file
+                File.WriteAllLines(filePath, lines);
+
+                FormatCode(filePath);
+            }
+            else
+            {
+                Console.WriteLine($"File not found: {filePath}");
+            }
+
+        }
+
+        private protected async Task CreateOnBackToPreviousPageClicked(string filePath, string path)
+        {
+            var sort = filePath;
+            filePath = filePath.Replace('/', '\\');
+
+            if (File.Exists(filePath))
+            {
+                string[] lines = File.ReadAllLines(filePath);
+
+                // Find the starting line of the GetPageRoutes method
+                int startIndex = -1;
+                for (int i = 0; i < lines.Length; i++)
+                {
+                    if (lines[i].Contains("OnMapBackToPreviousPageClicked()"))
+                    {
+                        startIndex = i;
+                        break;
+                    }
+                }
+
+                if (startIndex != -1) return;
+                if (startIndex != -1)
+                {
+                    // Find the real ending brace of the GetPageRoutes method
+                    int endIndex = UtilsHelper.FindMatchingClosingBrace(lines, startIndex);
+
+                    // Remove existing GetPageRoutes method
+                    if (endIndex != -1)
+                    {
+                        lines = lines.Take(startIndex).Concat(lines.Skip(endIndex + 1)).ToArray();
+                    }
+                }
+
+                //read file content
+                var fileContent = File.ReadAllText(sort);
+
+                // Assuming .razor.cs file contains a class definition, extract its type.
+                var className = await ComponentHelper.ExtractComponentClassName(fileContent);
+
+                if (className == null)
+                {
+                    Console.WriteLine($">>> Failed to extract component type from the file content. Path: {filePath}");
+                    return;
+                }
+
+                // Find the index where the GetPageRoutes method was removed
+                int insertIndex = startIndex;
+
+                // Generate the new method code
+                StringBuilder newMethodCode = new StringBuilder();
+                newMethodCode.AppendLine("public async Task OnMapBackToPreviousPageClicked()");
+                newMethodCode.AppendLine("{");
+                newMethodCode.AppendLine($"  PageRouteContainer = await OnBackToPreviousPageClicked(PageRouteContainer, PageRouteRegistry, typeof({className}));");
                 newMethodCode.AppendLine("}");
 
                 if (startIndex != -1)
@@ -436,6 +516,7 @@ namespace Mendi.Blazor.DynamicNavigation.CLI
                     }
                 }
 
+                if (startIndex != -1) return;
                 if (startIndex != -1)
                 {
                     // Find the real ending brace of the GetPageRoutes method
@@ -495,6 +576,7 @@ namespace Mendi.Blazor.DynamicNavigation.CLI
                     }
                 }
 
+                if (startIndex != -1) return;
                 if (startIndex != -1)
                 {
                     // Find the real ending brace of the GetPageRoutes method
@@ -554,6 +636,7 @@ namespace Mendi.Blazor.DynamicNavigation.CLI
                     }
                 }
 
+                if (startIndex != -1) return;
                 if (startIndex != -1)
                 {
                     // Find the real ending brace of the GetPageRoutes method

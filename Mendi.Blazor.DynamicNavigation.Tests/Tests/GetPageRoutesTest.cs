@@ -12,7 +12,7 @@ namespace Mendi.Blazor.TrueSPA.CLI.Test
             // Arrange
             var command = new GetPageRoutes();
             //specify a valid blazor assembly project path
-            var filePath = @"C:\Remote\Mendi.Blazor.DynamicNavigation\Test";
+            var filePath = @"C:\Remote\Tests\Test";
 
             Assert.DoesNotThrowAsync(async () =>
             {
