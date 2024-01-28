@@ -14,6 +14,11 @@ namespace Mendi.Blazor.DynamicNavigation
         {
             CurrentPageRoute = NavigatorContainer.CurrentPageRoute;
             ApplicationRoutes = NavigatorRegistry.ApplicationRoutes;
+
+            if (CurrentPageRoute is null)
+            {
+                Console.WriteLine("No routable component found");
+            }
         }
     }
 }
