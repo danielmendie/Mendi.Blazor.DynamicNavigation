@@ -121,7 +121,7 @@ ContinueProcess:
                 var groupedComponents = componentInfoList.GroupBy(info => info.AppId).OrderByDescending(f => f.Key);
 
                 var sb = new StringBuilder();
-                sb.AppendLine("SinglePageRoute = await IndexDbGetValue<DynamicNavigatorRoute>(IndexDbKeyTypes.Page);");
+                sb.AppendLine("SinglePageRoute = await DynamicNavigatorIndexDbGetValue<DynamicNavigatorRoute>(DynamicNavigatorIndexDbKeyTypes.Page);");
                 sb.AppendLine("if (SinglePageRoute is null || string.IsNullOrWhiteSpace(SinglePageRoute?.Component))");
                 sb.AppendLine("{");
                 sb.AppendLine("    try");
@@ -132,7 +132,7 @@ ContinueProcess:
                 sb.AppendLine($"       var getPage = PageRouteRegistry.ApplicationRoutes.FirstOrDefault(v => v.Value.ComponentPath.Equals(componentPath));");
                 sb.AppendLine($"       var singlePageRoute = new DynamicNavigatorRoute{{AppId = getPage.Value.AppId,AppName = getPage.Value.AppName,Component = getPage.Value.ComponentName}};");
 
-                sb.AppendLine("        await IndexDbAddValue(IndexDbKeyTypes.Page, singlePageRoute);");
+                sb.AppendLine("        await DynamicNavigatorIndexDbAddValue(DynamicNavigatorIndexDbKeyTypes.Page, singlePageRoute);");
                 sb.AppendLine("    }");
                 sb.AppendLine("    catch (Exception ex)");
                 sb.AppendLine("    {");

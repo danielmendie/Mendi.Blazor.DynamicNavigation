@@ -252,7 +252,7 @@ namespace Mendi.Blazor.DynamicNavigation.CLI
 
                 sb.AppendLine("    }");
                 sb.AppendLine("};");
-                sb.AppendLine("await IndexDbAddValue(IndexDbKeyTypes.Routes, PageRouteRegistry);");
+                sb.AppendLine("await DynamicNavigatorIndexDbAddValue(DynamicNavigatorIndexDbKeyTypes.Routes, PageRouteRegistry);");
                 sb.AppendLine("await BuildPageRoutes();");
 
                 CreatePageRouteContainer(basePath);

@@ -5,7 +5,7 @@ namespace Mendi.Blazor.DynamicNavigation
     public abstract class DynamicNavigatorComponentBase : ComponentBase
     {
         [Inject] protected private NavigationManager NavigationManager { get; set; } = null!;
-        [Inject] public IndexedDbAccessor IndexedDbAccessor { get; set; } = null!;
+        [Inject] private IndexedDbAccessor IndexedDbAccessor { get; set; } = null!;
 
         private List<NavigatorHistory> NavigationHistory = [];
 
@@ -56,7 +56,7 @@ namespace Mendi.Blazor.DynamicNavigation
                         AppName = pageRoute.Value.AppName,
                         Component = nameof(pageRoute.Value.ComponentName)
                     };
-                    await IndexDbAddValue(IndexDbKeyTypes.Page, data);
+                    await DynamicNavigatorIndexDbAddValue(DynamicNavigatorIndexDbKeyTypes.Page, data);
                     NavigationManager.NavigateTo("/", forceLoad: true);
                 }
             }
@@ -91,7 +91,7 @@ namespace Mendi.Blazor.DynamicNavigation
                     var comInfo = registry.ApplicationRoutes[$"{previousPage.Page}"];
                     container = new DynamicNavigatorContainer { CurrentPageRoute = callingComponent.Assembly.GetType(comInfo.ComponentPath) };
                     DynamicNavigatorRoute SinglePageRoute = new() { AppId = comInfo.AppId, AppName = comInfo.AppName, Component = previousPage.Page, Params = previousPage.Params ?? [] };
-                    await IndexDbAddValue(IndexDbKeyTypes.Page, SinglePageRoute);
+                    await DynamicNavigatorIndexDbAddValue(DynamicNavigatorIndexDbKeyTypes.Page, SinglePageRoute);
                 }
                 catch (Exception ex)
                 {
@@ -126,7 +126,7 @@ namespace Mendi.Blazor.DynamicNavigation
                 var comInfo = registry.ApplicationRoutes[$"{page}"];
                 container = new DynamicNavigatorContainer { CurrentPageRoute = callingComponent.Assembly.GetType(comInfo.ComponentPath) };
                 DynamicNavigatorRoute SinglePageRoute = new() { AppId = comInfo.AppId, AppName = comInfo.AppName, Component = page, Params = parameters ?? [] };
-                await IndexDbAddValue(IndexDbKeyTypes.Page, SinglePageRoute);
+                await DynamicNavigatorIndexDbAddValue(DynamicNavigatorIndexDbKeyTypes.Page, SinglePageRoute);
 
                 var history = new NavigatorHistory { Page = page, Params = parameters ?? [] };
                 if (NavigationHistory.Count == 0 || NavigationHistory[^1] != history)
@@ -155,7 +155,7 @@ namespace Mendi.Blazor.DynamicNavigation
                     var comInfo = registry.ApplicationRoutes[$"{pageComponentName}"];
                     container = new DynamicNavigatorContainer { CurrentPageRoute = callingComponent.Assembly.GetType(comInfo.ComponentPath) };
                     DynamicNavigatorRoute SinglePageRoute = new() { AppId = comInfo.AppId, AppName = comInfo.AppName, Component = pageComponentName };
-                    await IndexDbAddValue(IndexDbKeyTypes.Page, SinglePageRoute);
+                    await DynamicNavigatorIndexDbAddValue(DynamicNavigatorIndexDbKeyTypes.Page, SinglePageRoute);
 
                     var history = new NavigatorHistory { Page = pageComponentName, Params = [] };
                     if (NavigationHistory.Count == 0 || NavigationHistory[^1] != history)
@@ -176,24 +176,24 @@ namespace Mendi.Blazor.DynamicNavigation
         /// <typeparam name="T"></typeparam>
         /// <param name="key"></param>
         /// <returns></returns>
-        public async Task<T> IndexDbGetValue<T>(string key) => await IndexedDbAccessor.GetValueAsync<T>(IndexDbTableNameTypes.Navigator, key);
+        public async Task<T> DynamicNavigatorIndexDbGetValue<T>(string key) => await IndexedDbAccessor.GetValueAsync<T>(DynamicNavigatorIndexDbTableNameTypes.Navigator, key);
         /// <summary>
         /// Persist data in browswer using index db
         /// </summary>
         /// <param name="key"></param>
         /// <param name="value"></param>
         /// <returns></returns>
-        public async Task IndexDbAddValue(string key, object value) => await IndexedDbAccessor.SetValueAsync(IndexDbTableNameTypes.Navigator, new { Id = key, value });
+        public async Task DynamicNavigatorIndexDbAddValue(string key, object value) => await IndexedDbAccessor.SetValueAsync(DynamicNavigatorIndexDbTableNameTypes.Navigator, new { Id = key, value });
         /// <summary>
         /// Delete data persisted in index db
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-        public async Task IndexDbDeleteValue(string key) => await IndexedDbAccessor.RemoveValueAsync(IndexDbTableNameTypes.Navigator, key);
+        public async Task DynamicNavigatorIndexDbDeleteValue(string key) => await IndexedDbAccessor.RemoveValueAsync(DynamicNavigatorIndexDbTableNameTypes.Navigator, key);
         /// <summary>
         /// Clear out all data persisted in index db
         /// </summary>
         /// <returns></returns>
-        public async Task IndexDbClearValue() => await IndexedDbAccessor.ClearAllValueAsync(IndexDbTableNameTypes.Navigator);
+        public async Task DynamicNavigatorIndexDbClearValue() => await IndexedDbAccessor.ClearAllValueAsync(DynamicNavigatorIndexDbTableNameTypes.Navigator);
     }
 }
