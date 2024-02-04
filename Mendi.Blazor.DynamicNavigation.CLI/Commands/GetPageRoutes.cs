@@ -49,6 +49,7 @@ namespace Mendi.Blazor.DynamicNavigation.CLI
             }
         }
 
+        static List<string> ProjectNameSpaces = [];
         private async Task GenerateRoutes(IEnumerable<string> routeFilePaths, string path)
         {
             try
@@ -81,7 +82,7 @@ namespace Mendi.Blazor.DynamicNavigation.CLI
                     var fileContent = File.ReadAllText(componentPath);
 
                     // Assuming .razor.cs file contains a class definition, extract its type.
-                    var componentType = await ComponentHelper.ExtractComponentTypeAsync(fileContent, path);
+                    var (componentType, nameSpace) = await ComponentHelper.ExtractComponentTypeAsync(fileContent, path);
 
                     if (componentType == null)
                     {
@@ -111,12 +112,16 @@ namespace Mendi.Blazor.DynamicNavigation.CLI
                                 AppName = appName
                             });
                         }
+
+                        if (!string.IsNullOrWhiteSpace(nameSpace))
+                            ProjectNameSpaces.Add(nameSpace);
                     }
                 }
 
                 var sb = new StringBuilder();
                 sb.AppendLine(" PageRouteRegistry = new DynamicNavigatorRegistry");
                 sb.AppendLine("{");
+                sb.AppendLine("//routable components found for your app");
                 sb.AppendLine("    ApplicationRoutes = new()");
                 sb.AppendLine("    {");
 
@@ -258,9 +263,9 @@ namespace Mendi.Blazor.DynamicNavigation.CLI
                 CreatePageRouteContainer(basePath);
                 CreatePageRouteRegistry(basePath);
                 CreateSinglePageRoute(basePath);
-                await CreateOnBackToPreviousPageClicked(basePath, path);
-                await CreateOnMapNavMenuClicked(basePath, path);
-                await CreateOnMapPageItemClicked(basePath, path);
+                await CreateOnBackToPreviousPageClicked(basePath);
+                await CreateOnMapNavMenuClicked(basePath);
+                await CreateOnMapPageItemClicked(basePath);
                 SaveGeneratedRoutes(sb.ToString(), basePath);
 
                 #endregion
@@ -272,7 +277,7 @@ namespace Mendi.Blazor.DynamicNavigation.CLI
             }
         }
 
-        private protected async Task CreateOnMapNavMenuClicked(string filePath, string path)
+        private protected static async Task CreateOnMapNavMenuClicked(string filePath)
         {
             var sort = filePath;
             filePath = filePath.Replace('/', '\\');
@@ -292,7 +297,8 @@ namespace Mendi.Blazor.DynamicNavigation.CLI
                     }
                 }
 
-                if (startIndex != -1) return;
+                bool proceed = true;
+                if (startIndex != -1) proceed = false;
                 if (startIndex != -1)
                 {
                     // Find the real ending brace of the GetPageRoutes method
@@ -305,36 +311,40 @@ namespace Mendi.Blazor.DynamicNavigation.CLI
                     }
                 }
 
-                //read file content
-                var fileContent = File.ReadAllText(sort);
-
-                // Assuming .razor.cs file contains a class definition, extract its type.
-                var className = await ComponentHelper.ExtractComponentClassName(fileContent);
-
-                // Find the index where the GetPageRoutes method was removed
-                int insertIndex = startIndex;
-
-                // Generate the new method code
-                StringBuilder newMethodCode = new StringBuilder();
-                newMethodCode.AppendLine("public async Task OnMapNavMenuClicked(string page)");
-                newMethodCode.AppendLine("{");
-                newMethodCode.AppendLine($"  PageRouteContainer = await OnNavMenuItemCliked(page, PageRouteContainer, PageRouteRegistry, typeof({className}));");
-                newMethodCode.AppendLine("}");
-
-                if (startIndex != -1)
+                if (proceed)
                 {
-                    // Insert the new method code
-                    lines = lines.Take(insertIndex).Concat(newMethodCode.ToString().Split('\n')).Concat(lines.Skip(insertIndex)).ToArray();
-                }
-                else
-                {
-                    lines = lines.Take(lines.Length - 1).Concat(newMethodCode.ToString().Split('\n')).Concat(new[] { "}" }).ToArray();
-                }
+                    //read file content
+                    var fileContent = File.ReadAllText(sort);
 
-                // Write the modified content back to the file
-                File.WriteAllLines(filePath, lines);
+                    // Assuming .razor.cs file contains a class definition, extract its type.
+                    var className = await ComponentHelper.ExtractComponentClassName(fileContent);
 
-                FormatCode(filePath);
+                    // Find the index where the GetPageRoutes method was removed
+                    int insertIndex = startIndex;
+
+                    // Generate the new method code
+                    StringBuilder newMethodCode = new StringBuilder();
+                    newMethodCode.AppendLine("public async Task OnMapNavMenuClicked(string page)");
+                    newMethodCode.AppendLine("{");
+                    newMethodCode.AppendLine("//add code logic before or after this line depending on your use case");
+                    newMethodCode.AppendLine($"  PageRouteContainer = await OnNavMenuItemCliked(page, PageRouteContainer, PageRouteRegistry, typeof({className}));");
+                    newMethodCode.AppendLine("}");
+
+                    if (startIndex != -1)
+                    {
+                        // Insert the new method code
+                        lines = lines.Take(insertIndex).Concat(newMethodCode.ToString().Split('\n')).Concat(lines.Skip(insertIndex)).ToArray();
+                    }
+                    else
+                    {
+                        lines = lines.Take(lines.Length - 1).Concat(newMethodCode.ToString().Split('\n')).Concat(new[] { "}" }).ToArray();
+                    }
+
+                    // Write the modified content back to the file
+                    File.WriteAllLines(filePath, lines);
+
+                    FormatCode(filePath);
+                }
             }
             else
             {
@@ -343,7 +353,7 @@ namespace Mendi.Blazor.DynamicNavigation.CLI
 
         }
 
-        private protected async Task CreateOnMapPageItemClicked(string filePath, string path)
+        private protected static async Task CreateOnMapPageItemClicked(string filePath)
         {
             var sort = filePath;
             filePath = filePath.Replace('/', '\\');
@@ -363,7 +373,8 @@ namespace Mendi.Blazor.DynamicNavigation.CLI
                     }
                 }
 
-                if (startIndex != -1) return;
+                bool proceed = true;
+                if (startIndex != -1) proceed = false;
                 if (startIndex != -1)
                 {
                     // Find the real ending brace of the GetPageRoutes method
@@ -376,42 +387,46 @@ namespace Mendi.Blazor.DynamicNavigation.CLI
                     }
                 }
 
-                //read file content
-                var fileContent = File.ReadAllText(sort);
-
-                // Assuming .razor.cs file contains a class definition, extract its type.
-                var className = await ComponentHelper.ExtractComponentClassName(fileContent);
-
-                if (className == null)
+                if (proceed)
                 {
-                    Console.WriteLine($">>> Failed to extract component type from the file content. Path: {filePath}");
-                    return;
+                    //read file content
+                    var fileContent = File.ReadAllText(sort);
+
+                    // Assuming .razor.cs file contains a class definition, extract its type.
+                    var className = await ComponentHelper.ExtractComponentClassName(fileContent);
+
+                    if (className == null)
+                    {
+                        Console.WriteLine($">>> Failed to extract component type from the file content. Path: {filePath}");
+                        return;
+                    }
+
+                    // Find the index where the GetPageRoutes method was removed
+                    int insertIndex = startIndex;
+
+                    // Generate the new method code
+                    StringBuilder newMethodCode = new StringBuilder();
+                    newMethodCode.AppendLine("public async Task OnMapPageItemClicked(Dictionary<string, string> parameters, string nextPage)");
+                    newMethodCode.AppendLine("{");
+                    newMethodCode.AppendLine("//add code logic before or after this line depending on your use case");
+                    newMethodCode.AppendLine($"  PageRouteContainer = await OnPageItemClicked(parameters, nextPage, PageRouteContainer, PageRouteRegistry, typeof({className}));");
+                    newMethodCode.AppendLine("}");
+
+                    if (startIndex != -1)
+                    {
+                        // Insert the new method code
+                        lines = lines.Take(insertIndex).Concat(newMethodCode.ToString().Split('\n')).Concat(lines.Skip(insertIndex)).ToArray();
+                    }
+                    else
+                    {
+                        lines = lines.Take(lines.Length - 1).Concat(newMethodCode.ToString().Split('\n')).Concat(new[] { "}" }).ToArray();
+                    }
+
+                    // Write the modified content back to the file
+                    File.WriteAllLines(filePath, lines);
+
+                    FormatCode(filePath);
                 }
-
-                // Find the index where the GetPageRoutes method was removed
-                int insertIndex = startIndex;
-
-                // Generate the new method code
-                StringBuilder newMethodCode = new StringBuilder();
-                newMethodCode.AppendLine("public async Task OnMapPageItemClicked(Dictionary<string, string> parameters, string nextPage)");
-                newMethodCode.AppendLine("{");
-                newMethodCode.AppendLine($"  PageRouteContainer = await OnPageItemClicked(parameters, nextPage, PageRouteContainer, PageRouteRegistry, typeof({className}));");
-                newMethodCode.AppendLine("}");
-
-                if (startIndex != -1)
-                {
-                    // Insert the new method code
-                    lines = lines.Take(insertIndex).Concat(newMethodCode.ToString().Split('\n')).Concat(lines.Skip(insertIndex)).ToArray();
-                }
-                else
-                {
-                    lines = lines.Take(lines.Length - 1).Concat(newMethodCode.ToString().Split('\n')).Concat(new[] { "}" }).ToArray();
-                }
-
-                // Write the modified content back to the file
-                File.WriteAllLines(filePath, lines);
-
-                FormatCode(filePath);
             }
             else
             {
@@ -420,7 +435,7 @@ namespace Mendi.Blazor.DynamicNavigation.CLI
 
         }
 
-        private protected async Task CreateOnBackToPreviousPageClicked(string filePath, string path)
+        private protected static async Task CreateOnBackToPreviousPageClicked(string filePath)
         {
             var sort = filePath;
             filePath = filePath.Replace('/', '\\');
@@ -440,7 +455,8 @@ namespace Mendi.Blazor.DynamicNavigation.CLI
                     }
                 }
 
-                if (startIndex != -1) return;
+                bool proceed = true;
+                if (startIndex != -1) proceed = false;
                 if (startIndex != -1)
                 {
                     // Find the real ending brace of the GetPageRoutes method
@@ -453,42 +469,46 @@ namespace Mendi.Blazor.DynamicNavigation.CLI
                     }
                 }
 
-                //read file content
-                var fileContent = File.ReadAllText(sort);
-
-                // Assuming .razor.cs file contains a class definition, extract its type.
-                var className = await ComponentHelper.ExtractComponentClassName(fileContent);
-
-                if (className == null)
+                if (proceed)
                 {
-                    Console.WriteLine($">>> Failed to extract component type from the file content. Path: {filePath}");
-                    return;
+                    //read file content
+                    var fileContent = File.ReadAllText(sort);
+
+                    // Assuming .razor.cs file contains a class definition, extract its type.
+                    var className = await ComponentHelper.ExtractComponentClassName(fileContent);
+
+                    if (className == null)
+                    {
+                        Console.WriteLine($">>> Failed to extract component type from the file content. Path: {filePath}");
+                        return;
+                    }
+
+                    // Find the index where the GetPageRoutes method was removed
+                    int insertIndex = startIndex;
+
+                    // Generate the new method code
+                    StringBuilder newMethodCode = new StringBuilder();
+                    newMethodCode.AppendLine("public async Task OnMapBackToPreviousPageClicked()");
+                    newMethodCode.AppendLine("{");
+                    newMethodCode.AppendLine("//add code logic before or after this line depending on your use case");
+                    newMethodCode.AppendLine($"  PageRouteContainer = await OnBackToPreviousPageClicked(PageRouteContainer, PageRouteRegistry, typeof({className}));");
+                    newMethodCode.AppendLine("}");
+
+                    if (startIndex != -1)
+                    {
+                        // Insert the new method code
+                        lines = lines.Take(insertIndex).Concat(newMethodCode.ToString().Split('\n')).Concat(lines.Skip(insertIndex)).ToArray();
+                    }
+                    else
+                    {
+                        lines = lines.Take(lines.Length - 1).Concat(newMethodCode.ToString().Split('\n')).Concat(new[] { "}" }).ToArray();
+                    }
+
+                    // Write the modified content back to the file
+                    File.WriteAllLines(filePath, lines);
+
+                    FormatCode(filePath);
                 }
-
-                // Find the index where the GetPageRoutes method was removed
-                int insertIndex = startIndex;
-
-                // Generate the new method code
-                StringBuilder newMethodCode = new StringBuilder();
-                newMethodCode.AppendLine("public async Task OnMapBackToPreviousPageClicked()");
-                newMethodCode.AppendLine("{");
-                newMethodCode.AppendLine($"  PageRouteContainer = await OnBackToPreviousPageClicked(PageRouteContainer, PageRouteRegistry, typeof({className}));");
-                newMethodCode.AppendLine("}");
-
-                if (startIndex != -1)
-                {
-                    // Insert the new method code
-                    lines = lines.Take(insertIndex).Concat(newMethodCode.ToString().Split('\n')).Concat(lines.Skip(insertIndex)).ToArray();
-                }
-                else
-                {
-                    lines = lines.Take(lines.Length - 1).Concat(newMethodCode.ToString().Split('\n')).Concat(new[] { "}" }).ToArray();
-                }
-
-                // Write the modified content back to the file
-                File.WriteAllLines(filePath, lines);
-
-                FormatCode(filePath);
             }
             else
             {
@@ -509,14 +529,15 @@ namespace Mendi.Blazor.DynamicNavigation.CLI
                 int startIndex = -1;
                 for (int i = 0; i < lines.Length; i++)
                 {
-                    if (lines[i].Contains("public DynamicNavigatorRegistry PageRouteRegistry { get; set; }"))
+                    if (lines[i].Contains("DynamicNavigatorRegistry PageRouteRegistry { get; set; }"))
                     {
                         startIndex = i;
                         break;
                     }
                 }
 
-                if (startIndex != -1) return;
+                bool proceed = true;
+                if (startIndex != -1) proceed = false;
                 if (startIndex != -1)
                 {
                     // Find the real ending brace of the GetPageRoutes method
@@ -529,27 +550,30 @@ namespace Mendi.Blazor.DynamicNavigation.CLI
                     }
                 }
 
-                // Find the index where the GetPageRoutes method was removed
-                int insertIndex = startIndex;
-
-                // Generate the new method code
-                StringBuilder newMethodCode = new StringBuilder();
-                newMethodCode.AppendLine("[Inject] public DynamicNavigatorRegistry PageRouteRegistry { get; set; } = null!;");
-
-                if (startIndex != -1)
+                if (proceed)
                 {
-                    // Insert the new method code
-                    lines = lines.Take(insertIndex).Concat(newMethodCode.ToString().Split('\n')).Concat(lines.Skip(insertIndex)).ToArray();
-                }
-                else
-                {
-                    lines = lines.Take(lines.Length - 1).Concat(newMethodCode.ToString().Split('\n')).Concat(new[] { "}" }).ToArray();
-                }
+                    // Find the index where the GetPageRoutes method was removed
+                    int insertIndex = startIndex;
 
-                // Write the modified content back to the file
-                File.WriteAllLines(filePath, lines);
+                    // Generate the new method code
+                    StringBuilder newMethodCode = new StringBuilder();
+                    newMethodCode.AppendLine("[Inject] public DynamicNavigatorRegistry PageRouteRegistry { get; set; } = null!;");
 
-                FormatCode(filePath);
+                    if (startIndex != -1)
+                    {
+                        // Insert the new method code
+                        lines = lines.Take(insertIndex).Concat(newMethodCode.ToString().Split('\n')).Concat(lines.Skip(insertIndex)).ToArray();
+                    }
+                    else
+                    {
+                        lines = lines.Take(lines.Length - 1).Concat(newMethodCode.ToString().Split('\n')).Concat(new[] { "}" }).ToArray();
+                    }
+
+                    // Write the modified content back to the file
+                    File.WriteAllLines(filePath, lines);
+
+                    FormatCode(filePath);
+                }
             }
             else
             {
@@ -569,14 +593,15 @@ namespace Mendi.Blazor.DynamicNavigation.CLI
                 int startIndex = -1;
                 for (int i = 0; i < lines.Length; i++)
                 {
-                    if (lines[i].Contains("public DynamicNavigatorRoute SinglePageRoute { get; set; }"))
+                    if (lines[i].Contains("DynamicNavigatorRoute SinglePageRoute { get; set; }"))
                     {
                         startIndex = i;
                         break;
                     }
                 }
 
-                if (startIndex != -1) return;
+                bool proceed = true;
+                if (startIndex != -1) proceed = false;
                 if (startIndex != -1)
                 {
                     // Find the real ending brace of the GetPageRoutes method
@@ -589,27 +614,30 @@ namespace Mendi.Blazor.DynamicNavigation.CLI
                     }
                 }
 
-                // Find the index where the GetPageRoutes method was removed
-                int insertIndex = startIndex;
-
-                // Generate the new method code
-                StringBuilder newMethodCode = new StringBuilder();
-                newMethodCode.AppendLine("public DynamicNavigatorRoute SinglePageRoute { get; set; } = null!;");
-
-                if (startIndex != -1)
+                if (proceed)
                 {
-                    // Insert the new method code
-                    lines = lines.Take(insertIndex).Concat(newMethodCode.ToString().Split('\n')).Concat(lines.Skip(insertIndex)).ToArray();
-                }
-                else
-                {
-                    lines = lines.Take(lines.Length - 1).Concat(newMethodCode.ToString().Split('\n')).Concat(new[] { "}" }).ToArray();
-                }
+                    // Find the index where the GetPageRoutes method was removed
+                    int insertIndex = startIndex;
 
-                // Write the modified content back to the file
-                File.WriteAllLines(filePath, lines);
+                    // Generate the new method code
+                    StringBuilder newMethodCode = new StringBuilder();
+                    newMethodCode.AppendLine("public DynamicNavigatorRoute SinglePageRoute { get; set; } = null!;");
 
-                FormatCode(filePath);
+                    if (startIndex != -1)
+                    {
+                        // Insert the new method code
+                        lines = lines.Take(insertIndex).Concat(newMethodCode.ToString().Split('\n')).Concat(lines.Skip(insertIndex)).ToArray();
+                    }
+                    else
+                    {
+                        lines = lines.Take(lines.Length - 1).Concat(newMethodCode.ToString().Split('\n')).Concat(new[] { "}" }).ToArray();
+                    }
+
+                    // Write the modified content back to the file
+                    File.WriteAllLines(filePath, lines);
+
+                    FormatCode(filePath);
+                }
             }
             else
             {
@@ -629,14 +657,15 @@ namespace Mendi.Blazor.DynamicNavigation.CLI
                 int startIndex = -1;
                 for (int i = 0; i < lines.Length; i++)
                 {
-                    if (lines[i].Contains("public DynamicNavigatorContainer PageRouteContainer { get; set; }"))
+                    if (lines[i].Contains("DynamicNavigatorContainer PageRouteContainer { get; set; }"))
                     {
                         startIndex = i;
                         break;
                     }
                 }
 
-                if (startIndex != -1) return;
+                bool proceed = true;
+                if (startIndex != -1) proceed = false;
                 if (startIndex != -1)
                 {
                     // Find the real ending brace of the GetPageRoutes method
@@ -649,27 +678,30 @@ namespace Mendi.Blazor.DynamicNavigation.CLI
                     }
                 }
 
-                // Find the index where the GetPageRoutes method was removed
-                int insertIndex = startIndex;
-
-                // Generate the new method code
-                StringBuilder newMethodCode = new StringBuilder();
-                newMethodCode.AppendLine("[Inject] public DynamicNavigatorContainer PageRouteContainer { get; set; } = null!;");
-
-                if (startIndex != -1)
+                if (proceed)
                 {
-                    // Insert the new method code
-                    lines = lines.Take(insertIndex).Concat(newMethodCode.ToString().Split('\n')).Concat(lines.Skip(insertIndex)).ToArray();
-                }
-                else
-                {
-                    lines = lines.Take(lines.Length - 1).Concat(newMethodCode.ToString().Split('\n')).Concat(new[] { "}" }).ToArray();
-                }
+                    // Find the index where the GetPageRoutes method was removed
+                    int insertIndex = startIndex;
 
-                // Write the modified content back to the file
-                File.WriteAllLines(filePath, lines);
+                    // Generate the new method code
+                    StringBuilder newMethodCode = new StringBuilder();
+                    newMethodCode.AppendLine("[Inject] public DynamicNavigatorContainer PageRouteContainer { get; set; } = null!;");
 
-                FormatCode(filePath);
+                    if (startIndex != -1)
+                    {
+                        // Insert the new method code
+                        lines = lines.Take(insertIndex).Concat(newMethodCode.ToString().Split('\n')).Concat(lines.Skip(insertIndex)).ToArray();
+                    }
+                    else
+                    {
+                        lines = lines.Take(lines.Length - 1).Concat(newMethodCode.ToString().Split('\n')).Concat(new[] { "}" }).ToArray();
+                    }
+
+                    // Write the modified content back to the file
+                    File.WriteAllLines(filePath, lines);
+
+                    FormatCode(filePath);
+                }
             }
             else
             {
@@ -750,12 +782,17 @@ namespace Mendi.Blazor.DynamicNavigation.CLI
                 SyntaxTree syntaxTree = CSharpSyntaxTree.ParseText(fileContent);
                 CompilationUnitSyntax root = syntaxTree.GetCompilationUnitRoot();
 
+                var namespaces = new List<string>()
+                {
+                    new("Microsoft.AspNetCore.Components"),
+                    new("Mendi.Blazor.DynamicNavigation"),
+                };
+
+                if (ProjectNameSpaces is not null && ProjectNameSpaces.Count != 0)
+                    namespaces.AddRange(ProjectNameSpaces.Distinct());
+
                 // Add missing using statements
-                var usings = UtilsHelper.AddMissingUsings(root,
-                [
-                    "Microsoft.AspNetCore.Components",
-                    "Mendi.Blazor.DynamicNavigation"
-                ]);
+                var usings = UtilsHelper.AddMissingUsings(root, namespaces);
 
                 // Format the syntax tree using Roslyn's Formatter
                 SyntaxNode formattedRoot = Formatter.Format(usings, new AdhocWorkspace());

@@ -83,7 +83,7 @@ ContinueProcess:
                     var fileContent = File.ReadAllText(componentPath);
 
                     // Assuming .razor.cs file contains a class definition, extract its type.
-                    var componentType = await ComponentHelper.ExtractComponentTypeAsync(fileContent, path);
+                    var (componentType, nameSpace) = await ComponentHelper.ExtractComponentTypeAsync(fileContent, path);
 
                     if (componentType == null)
                     {
@@ -121,6 +121,7 @@ ContinueProcess:
                 var groupedComponents = componentInfoList.GroupBy(info => info.AppId).OrderByDescending(f => f.Key);
 
                 var sb = new StringBuilder();
+                sb.AppendLine("//add code logic before, after or between these lines depending on your use case");
                 sb.AppendLine("SinglePageRoute = await DynamicNavigatorIndexDbGetValue<DynamicNavigatorRoute>(DynamicNavigatorIndexDbKeyTypes.Page);");
                 sb.AppendLine("if (SinglePageRoute is null || string.IsNullOrWhiteSpace(SinglePageRoute?.Component))");
                 sb.AppendLine("{");
@@ -145,7 +146,7 @@ ContinueProcess:
                 sb.AppendLine("    try");
                 sb.AppendLine("    {");
 
-                sb.AppendLine("        if (SinglePageRoute.Params.Any())");
+                sb.AppendLine("        if (SinglePageRoute.Params.Count != 0)");
                 sb.AppendLine("        {");
                 sb.AppendLine("            foreach (var item in SinglePageRoute.Params)");
                 sb.AppendLine("            {");

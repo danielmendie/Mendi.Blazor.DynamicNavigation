@@ -109,7 +109,7 @@ namespace Mendi.Blazor.DynamicNavigation.CLI
             return attributeNodes.Any();
         }
 
-        public static async Task<Type?> ExtractComponentTypeAsync(string fileContent, string path)
+        public static async Task<(Type? componentType, string? nameSpace)> ExtractComponentTypeAsync(string fileContent, string path)
         {
             try
             {
@@ -146,7 +146,7 @@ namespace Mendi.Blazor.DynamicNavigation.CLI
 
                         if (targetType != null)
                         {
-                            return targetType;
+                            return (targetType, namespaceName);
                         }
                         else
                         {
@@ -160,7 +160,7 @@ namespace Mendi.Blazor.DynamicNavigation.CLI
                 Console.WriteLine($">>> Error extracting component type: {ex.Message}");
             }
 
-            return null;
+            return (null, null);
         }
 
         public static async Task<string> ExtractComponentClassName(string fileContent)
