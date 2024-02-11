@@ -257,7 +257,7 @@ namespace Mendi.Blazor.DynamicNavigation.CLI
 
                 sb.AppendLine("    }");
                 sb.AppendLine("};");
-                sb.AppendLine("await DynamicNavigatorIndexDbAddValue(DynamicNavigatorIndexDbKeyTypes.Routes, PageRouteRegistry);");
+                //sb.AppendLine("await DynamicNavigatorIndexDbAddValue(DynamicNavigatorIndexDbKeyTypes.Routes, PageRouteRegistry);");
                 sb.AppendLine("await BuildPageRoutes();");
 
                 CreatePageRouteContainer(basePath);
@@ -327,7 +327,8 @@ namespace Mendi.Blazor.DynamicNavigation.CLI
                     newMethodCode.AppendLine("public async Task OnMapNavMenuClicked(string page)");
                     newMethodCode.AppendLine("{");
                     newMethodCode.AppendLine("//add code logic before or after this line depending on your use case");
-                    newMethodCode.AppendLine($"  PageRouteContainer = await OnNavMenuItemCliked(page, PageRouteContainer, PageRouteRegistry, typeof({className}));");
+                    newMethodCode.AppendLine($" var navigatorRouteResult  = await OnNavMenuItemCliked(page, PageRouteContainer, PageRouteRegistry, typeof({className}));");
+                    newMethodCode.AppendLine(" PageRouteContainer = navigatorRouteResult.NavigatorContainer;");
                     newMethodCode.AppendLine("}");
 
                     if (startIndex != -1)
@@ -409,7 +410,8 @@ namespace Mendi.Blazor.DynamicNavigation.CLI
                     newMethodCode.AppendLine("public async Task OnMapPageItemClicked(Dictionary<string, string> parameters, string nextPage)");
                     newMethodCode.AppendLine("{");
                     newMethodCode.AppendLine("//add code logic before or after this line depending on your use case");
-                    newMethodCode.AppendLine($"  PageRouteContainer = await OnPageItemClicked(parameters, nextPage, PageRouteContainer, PageRouteRegistry, typeof({className}));");
+                    newMethodCode.AppendLine($"  var navigatorRouteResult = await OnPageItemClicked(parameters, nextPage, PageRouteContainer, PageRouteRegistry, typeof({className}));");
+                    newMethodCode.AppendLine("  PageRouteContainer = navigatorRouteResult.NavigatorContainer;");
                     newMethodCode.AppendLine("}");
 
                     if (startIndex != -1)
@@ -491,7 +493,8 @@ namespace Mendi.Blazor.DynamicNavigation.CLI
                     newMethodCode.AppendLine("public async Task OnMapBackToPreviousPageClicked()");
                     newMethodCode.AppendLine("{");
                     newMethodCode.AppendLine("//add code logic before or after this line depending on your use case");
-                    newMethodCode.AppendLine($"  PageRouteContainer = await OnBackToPreviousPageClicked(PageRouteContainer, PageRouteRegistry, typeof({className}));");
+                    newMethodCode.AppendLine($" var navigatorRouteResult = await OnBackToPreviousPageClicked(PageRouteContainer, PageRouteRegistry, typeof({className}));");
+                    newMethodCode.AppendLine("  PageRouteContainer = navigatorRouteResult.NavigatorContainer;");
                     newMethodCode.AppendLine("}");
 
                     if (startIndex != -1)

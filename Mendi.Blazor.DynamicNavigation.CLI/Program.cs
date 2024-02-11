@@ -1,5 +1,6 @@
 ﻿using CommandLine;
 using Mendi.Blazor.DynamicNavigation.CLI;
+using System.Reflection;
 
 public class Program
 {
@@ -49,6 +50,11 @@ public class Program
             {
                 Console.WriteLine($"Invalid scaffold action: {options.Subcommand}");
             }
+        }
+        else if (options.Command == "version")
+        {
+            var version = Assembly.GetExecutingAssembly().GetName().Version;
+            Console.WriteLine($"version: {version}");
         }
         else
         {

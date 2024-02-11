@@ -2,12 +2,12 @@
 
 namespace Mendi.Blazor.DynamicNavigation
 {
-    public class IndexedDbAccessor : IDisposable, IAsyncDisposable
+    public class DynamicNavigatorIndexedDbAccessor : IDisposable, IAsyncDisposable
     {
         private Lazy<IJSObjectReference>? _accessorJsRef = new();
         private readonly IJSRuntime _jsRuntime;
 
-        public IndexedDbAccessor(IJSRuntime jsRuntime)
+        public DynamicNavigatorIndexedDbAccessor(IJSRuntime jsRuntime)
         {
             _jsRuntime = jsRuntime;
         }

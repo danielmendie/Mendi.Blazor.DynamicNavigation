@@ -5,7 +5,7 @@ namespace Mendi.Blazor.DynamicNavigation
     public abstract class DynamicNavigatorComponentBase : ComponentBase
     {
         [Inject] protected private NavigationManager NavigationManager { get; set; } = null!;
-        [Inject] private IndexedDbAccessor IndexedDbAccessor { get; set; } = null!;
+        [Inject] private DynamicNavigatorIndexedDbAccessor IndexedDbAccessor { get; set; } = null!;
 
         private List<NavigatorHistory> NavigationHistory = [];
 
@@ -39,9 +39,11 @@ namespace Mendi.Blazor.DynamicNavigation
         /// <summary>
         /// Method invoked to switch between multiple app routes base on appId type
         /// </summary>
-        /// <param name="page"></param>
+        /// <param name="page">App Id of the component app to switch to</param>
+        /// <param name="registry">Dynamic navigator registry</param>
+        /// <param name="ignoreIndexOpt">Ignore persisting the dynamic navigation route data in IndexDB. Defaults to false </param>
         /// <exception cref="NotImplementedException"></exception>
-        public virtual async Task OnSwitchPageCliked(int page, DynamicNavigatorRegistry registry)
+        public virtual async Task OnSwitchPageCliked(int page, DynamicNavigatorRegistry registry, bool ignoreIndexOpt = false)
         {
             try
             {
@@ -56,7 +58,10 @@ namespace Mendi.Blazor.DynamicNavigation
                         AppName = pageRoute.Value.AppName,
                         Component = nameof(pageRoute.Value.ComponentName)
                     };
-                    await DynamicNavigatorIndexDbAddValue(DynamicNavigatorIndexDbKeyTypes.Page, data);
+
+                    if (!ignoreIndexOpt)
+                        await DynamicNavigatorIndexDbAddValue(DynamicNavigatorIndexDbKeyTypes.Page, data);
+
                     NavigationManager.NavigateTo("/", forceLoad: true);
                 }
             }
@@ -70,9 +75,14 @@ namespace Mendi.Blazor.DynamicNavigation
         /// Method invoked to return the previous page to the current screen.
         /// This is intended to behave like a browser's back button feature
         /// </summary>
-        /// <exception cref="NotImplementedException"></exception>
-        public virtual async Task<DynamicNavigatorContainer> OnBackToPreviousPageClicked(DynamicNavigatorContainer container, DynamicNavigatorRegistry registry, Type callingComponent)
+        /// <param name="container">Dynamic navigation container</param>
+        /// <param name="registry">Dynamic navigation registry</param>
+        /// <param name="callingComponent">Type of calling component or class</param>
+        /// <param name="ignoreIndexOpt">Ignore persisting the dynamic navigation route data in IndexDB. Defaults to false </param>
+        /// <returns></returns>
+        public virtual async Task<DynamicNavigatorRouteResult> OnBackToPreviousPageClicked(DynamicNavigatorContainer container, DynamicNavigatorRegistry registry, Type callingComponent, bool ignoreIndexOpt = false)
         {
+            DynamicNavigatorRouteResult result = new DynamicNavigatorRouteResult { NavigatorContainer = container };
             if (NavigationHistory.Count > 1)
             {
                 try
@@ -89,9 +99,12 @@ namespace Mendi.Blazor.DynamicNavigation
                     }
 
                     var comInfo = registry.ApplicationRoutes[$"{previousPage.Page}"];
-                    container = new DynamicNavigatorContainer { CurrentPageRoute = callingComponent.Assembly.GetType(comInfo.ComponentPath) };
                     DynamicNavigatorRoute SinglePageRoute = new() { AppId = comInfo.AppId, AppName = comInfo.AppName, Component = previousPage.Page, Params = previousPage.Params ?? [] };
-                    await DynamicNavigatorIndexDbAddValue(DynamicNavigatorIndexDbKeyTypes.Page, SinglePageRoute);
+                    result.NavigatorContainer = new DynamicNavigatorContainer { CurrentPageRoute = callingComponent.Assembly.GetType(comInfo.ComponentPath) };
+                    result.NavigatorRoute = SinglePageRoute;
+
+                    if (!ignoreIndexOpt)
+                        await DynamicNavigatorIndexDbAddValue(DynamicNavigatorIndexDbKeyTypes.Page, SinglePageRoute);
                 }
                 catch (Exception ex)
                 {
@@ -99,7 +112,52 @@ namespace Mendi.Blazor.DynamicNavigation
                 }
             }
 
-            return container;
+            return result;
+        }
+
+        /// <summary>
+        /// Method invoked to return the previous page to the current screen.
+        /// This is intended to behave like a browser's back button feature
+        /// </summary>
+        /// <param name="container">Dynamic navigation container</param>
+        /// <param name="registry">Dynamic navigation registry</param>
+        /// <param name="callingComponent">Type of calling component or class</param>
+        /// <param name="ignoreIndexOpt">Ignore persisting the dynamic navigation route data in IndexDB. Defaults to false </param>
+        /// <param name="navigationHistoryList">Custom list of string for storing navigation history</param>
+        /// <returns></returns>
+        public virtual async Task<DynamicNavigatorRouteResult> OnBackToPreviousPageClicked(DynamicNavigatorContainer container, DynamicNavigatorRegistry registry, Type callingComponent, List<NavigatorHistory> navigationHistoryList, bool ignoreIndexOpt = false)
+        {
+            DynamicNavigatorRouteResult result = new DynamicNavigatorRouteResult { NavigatorContainer = container };
+            if (navigationHistoryList.Count > 1)
+            {
+                try
+                {
+                    navigationHistoryList.RemoveAt(navigationHistoryList.Count - 1);
+                    var previousPage = navigationHistoryList[navigationHistoryList.Count - 1];
+
+                    if (previousPage.Params != null && previousPage.Params.Any())
+                    {
+                        foreach (var item in previousPage.Params)
+                        {
+                            registry.ApplicationRoutes[$"{previousPage.Page}"].ComponentParameters[item.Key] = item.Value;
+                        }
+                    }
+
+                    var comInfo = registry.ApplicationRoutes[$"{previousPage.Page}"];
+                    DynamicNavigatorRoute SinglePageRoute = new() { AppId = comInfo.AppId, AppName = comInfo.AppName, Component = previousPage.Page, Params = previousPage.Params ?? [] };
+                    result.NavigatorContainer = new DynamicNavigatorContainer { CurrentPageRoute = callingComponent.Assembly.GetType(comInfo.ComponentPath) };
+                    result.NavigatorRoute = SinglePageRoute;
+
+                    if (!ignoreIndexOpt)
+                        await DynamicNavigatorIndexDbAddValue(DynamicNavigatorIndexDbKeyTypes.Page, SinglePageRoute);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.ToString());
+                }
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -107,12 +165,16 @@ namespace Mendi.Blazor.DynamicNavigation
         /// event is fired for action passing back the required params
         /// for navigation and data consumption
         /// </summary>
-        /// <param name="parameters"></param>
-        /// <param name="page"></param>
-        /// <param name="callingComponent"></param>
+        /// <param name="parameters">Paramenters to pass to the receiving component</param>
+        /// <param name="page">Component page to invoke to the screen</param>
+        /// <param name="callingComponent">Type of calling component or class</param>
+        /// <param name="ignoreIndexOpt">Ignore persisting the dynamic navigation route data in IndexDB. Defaults to false </param>
+        /// <param name="container">Dynamic navigation container</param>
+        /// <param name="registry">Dynamic navigation registry</param>
         /// <returns></returns>
-        public virtual async Task<DynamicNavigatorContainer> OnPageItemClicked(Dictionary<string, string> parameters, string page, DynamicNavigatorContainer container, DynamicNavigatorRegistry registry, Type callingComponent)
+        public virtual async Task<DynamicNavigatorRouteResult> OnPageItemClicked(Dictionary<string, string> parameters, string page, DynamicNavigatorContainer container, DynamicNavigatorRegistry registry, Type callingComponent, bool ignoreIndexOpt = false)
         {
+            DynamicNavigatorRouteResult result = new DynamicNavigatorRouteResult { NavigatorContainer = container };
             try
             {
                 if (parameters != null && parameters.Any())
@@ -124,9 +186,12 @@ namespace Mendi.Blazor.DynamicNavigation
                 }
 
                 var comInfo = registry.ApplicationRoutes[$"{page}"];
-                container = new DynamicNavigatorContainer { CurrentPageRoute = callingComponent.Assembly.GetType(comInfo.ComponentPath) };
                 DynamicNavigatorRoute SinglePageRoute = new() { AppId = comInfo.AppId, AppName = comInfo.AppName, Component = page, Params = parameters ?? [] };
-                await DynamicNavigatorIndexDbAddValue(DynamicNavigatorIndexDbKeyTypes.Page, SinglePageRoute);
+                result.NavigatorContainer = new DynamicNavigatorContainer { CurrentPageRoute = callingComponent.Assembly.GetType(comInfo.ComponentPath) };
+                result.NavigatorRoute = SinglePageRoute;
+
+                if (!ignoreIndexOpt)
+                    await DynamicNavigatorIndexDbAddValue(DynamicNavigatorIndexDbKeyTypes.Page, SinglePageRoute);
 
                 var history = new NavigatorHistory { Page = page, Params = parameters ?? [] };
                 if (NavigationHistory.Count == 0 || NavigationHistory[^1] != history)
@@ -137,25 +202,116 @@ namespace Mendi.Blazor.DynamicNavigation
                 Console.WriteLine(ex.ToString());
             }
 
-            return container;
+            return result;
+        }
+
+        /// <summary>
+        /// Method invoked when a page components item is clicked and a callback
+        /// event is fired for action passing back the required params
+        /// for navigation and data consumption
+        /// </summary>
+        /// <param name="parameters">Paramenters to pass to the receiving component</param>
+        /// <param name="page">Component page to invoke to the screen</param>
+        /// <param name="callingComponent">Type of calling component or class</param>
+        /// <param name="ignoreIndexOpt">Ignore persisting the dynamic navigation route data in IndexDB. Defaults to false </param>
+        /// <param name="navigationHistoryList">Custom list of string for storing navigation history</param>
+        /// <param name="container">Dynamic navigation container</param>
+        /// <param name="registry">Dynamic navigation registry</param>
+        /// <returns></returns>
+        public virtual async Task<DynamicNavigatorRouteResult> OnPageItemClicked(Dictionary<string, string> parameters, string page, DynamicNavigatorContainer container, DynamicNavigatorRegistry registry, Type callingComponent, List<NavigatorHistory> navigationHistoryList, bool ignoreIndexOpt = false)
+        {
+            DynamicNavigatorRouteResult result = new DynamicNavigatorRouteResult { NavigatorContainer = container };
+            try
+            {
+                if (parameters != null && parameters.Any())
+                {
+                    foreach (var item in parameters)
+                    {
+                        registry.ApplicationRoutes[$"{page}"].ComponentParameters[item.Key] = item.Value;
+                    }
+                }
+
+                var comInfo = registry.ApplicationRoutes[$"{page}"];
+                DynamicNavigatorRoute SinglePageRoute = new() { AppId = comInfo.AppId, AppName = comInfo.AppName, Component = page, Params = parameters ?? [] };
+                result.NavigatorContainer = new DynamicNavigatorContainer { CurrentPageRoute = callingComponent.Assembly.GetType(comInfo.ComponentPath) };
+                result.NavigatorRoute = SinglePageRoute;
+
+                if (!ignoreIndexOpt)
+                    await DynamicNavigatorIndexDbAddValue(DynamicNavigatorIndexDbKeyTypes.Page, SinglePageRoute);
+
+                var history = new NavigatorHistory { Page = page, Params = parameters ?? [] };
+                if (navigationHistoryList.Count == 0 || navigationHistoryList[^1] != history)
+                    navigationHistoryList.Add(history);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+
+            return result;
         }
 
         /// <summary>
         /// Method invoked when a nav menu item is clicked and a callback event
         /// is fired for the action
         /// </summary>
-        /// <param name="pageComponentName"></param>
-        /// <param name="callingComponent"></param>
-        public virtual async Task<DynamicNavigatorContainer> OnNavMenuItemCliked(string pageComponentName, DynamicNavigatorContainer container, DynamicNavigatorRegistry registry, Type callingComponent)
+        /// <param name="pageComponentName">Component page to invoke to the screen</param>
+        /// <param name="callingComponent">Type of calling component or class</param>
+        /// <param name="navigationHistoryList">Custom list of string for storing navigation history</param>
+        /// <param name="ignoreIndexOpt">Ignore persisting the dynamic navigation route data in IndexDB. Defaults to false </param>
+        /// <param name="container">Dynamic navigation container</param>
+        /// <param name="registry">Dynamic navigation registry</param>
+        public virtual async Task<DynamicNavigatorRouteResult> OnNavMenuItemCliked(string pageComponentName, DynamicNavigatorContainer container, DynamicNavigatorRegistry registry, Type callingComponent, List<NavigatorHistory> navigationHistoryList, bool ignoreIndexOpt = false)
         {
+            DynamicNavigatorRouteResult result = new DynamicNavigatorRouteResult { NavigatorContainer = container };
             if (!string.IsNullOrWhiteSpace(pageComponentName) && callingComponent is not null)
             {
                 try
                 {
                     var comInfo = registry.ApplicationRoutes[$"{pageComponentName}"];
-                    container = new DynamicNavigatorContainer { CurrentPageRoute = callingComponent.Assembly.GetType(comInfo.ComponentPath) };
                     DynamicNavigatorRoute SinglePageRoute = new() { AppId = comInfo.AppId, AppName = comInfo.AppName, Component = pageComponentName };
-                    await DynamicNavigatorIndexDbAddValue(DynamicNavigatorIndexDbKeyTypes.Page, SinglePageRoute);
+                    result.NavigatorContainer = new DynamicNavigatorContainer { CurrentPageRoute = callingComponent.Assembly.GetType(comInfo.ComponentPath) };
+                    result.NavigatorRoute = SinglePageRoute;
+
+                    if (!ignoreIndexOpt)
+                        await DynamicNavigatorIndexDbAddValue(DynamicNavigatorIndexDbKeyTypes.Page, SinglePageRoute);
+
+                    var history = new NavigatorHistory { Page = pageComponentName, Params = [] };
+                    if (navigationHistoryList.Count == 0 || navigationHistoryList[^1] != history)
+                        navigationHistoryList.Add(history);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.ToString());
+                }
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Method invoked when a nav menu item is clicked and a callback event
+        /// is fired for the action
+        /// </summary>
+        /// <param name="pageComponentName">Component page to invoke to the screen</param>
+        /// <param name="callingComponent">Type of calling component or class</param>
+        /// <param name="ignoreIndexOpt">Ignore persisting the dynamic navigation route data in IndexDB. Defaults to false </param>
+        /// <param name="container">Dynamic navigation container</param>
+        /// <param name="registry">Dynamic navigation registry</param>
+        public virtual async Task<DynamicNavigatorRouteResult> OnNavMenuItemCliked(string pageComponentName, DynamicNavigatorContainer container, DynamicNavigatorRegistry registry, Type callingComponent, bool ignoreIndexOpt = false)
+        {
+            DynamicNavigatorRouteResult result = new DynamicNavigatorRouteResult { NavigatorContainer = container };
+            if (!string.IsNullOrWhiteSpace(pageComponentName) && callingComponent is not null)
+            {
+                try
+                {
+                    var comInfo = registry.ApplicationRoutes[$"{pageComponentName}"];
+                    DynamicNavigatorRoute SinglePageRoute = new() { AppId = comInfo.AppId, AppName = comInfo.AppName, Component = pageComponentName };
+                    result.NavigatorContainer = new DynamicNavigatorContainer { CurrentPageRoute = callingComponent.Assembly.GetType(comInfo.ComponentPath) };
+                    result.NavigatorRoute = SinglePageRoute;
+
+                    if (!ignoreIndexOpt)
+                        await DynamicNavigatorIndexDbAddValue(DynamicNavigatorIndexDbKeyTypes.Page, SinglePageRoute);
 
                     var history = new NavigatorHistory { Page = pageComponentName, Params = [] };
                     if (NavigationHistory.Count == 0 || NavigationHistory[^1] != history)
@@ -167,7 +323,7 @@ namespace Mendi.Blazor.DynamicNavigation
                 }
             }
 
-            return container;
+            return result;
         }
 
         /// <summary>

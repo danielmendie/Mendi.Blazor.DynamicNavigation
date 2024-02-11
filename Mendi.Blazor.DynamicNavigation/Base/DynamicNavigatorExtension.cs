@@ -9,12 +9,12 @@ namespace Mendi.Blazor.DynamicNavigation
         {
             builder.Services.AddSingleton<DynamicNavigatorContainer>();
             builder.Services.AddSingleton<DynamicNavigatorRegistry>();
-            builder.Services.AddScoped<IndexedDbAccessor>();
+            builder.Services.AddScoped<DynamicNavigatorIndexedDbAccessor>();
 
             var host = builder.Build();
 
             using var scope = host.Services.CreateScope();
-            var navigatorAccessor = scope.ServiceProvider.GetService<IndexedDbAccessor>();
+            var navigatorAccessor = scope.ServiceProvider.GetService<DynamicNavigatorIndexedDbAccessor>();
 
             if (navigatorAccessor is not null)
                 await navigatorAccessor.InitializeAsync();
