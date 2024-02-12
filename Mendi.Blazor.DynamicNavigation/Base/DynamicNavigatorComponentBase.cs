@@ -39,28 +39,34 @@ namespace Mendi.Blazor.DynamicNavigation
         /// <summary>
         /// Method invoked to switch between multiple app routes base on appId type
         /// </summary>
-        /// <param name="page">App Id of the component app to switch to</param>
+        /// <param name="appId">App Id of the component app to switch to</param>
         /// <param name="registry">Dynamic navigator registry</param>
+        /// <param name="container">Dynamic navigation container</param>
+        /// <param name="callingComponent">Type of calling component or class</param>
         /// <param name="ignoreIndexOpt">Ignore persisting the dynamic navigation route data in IndexDB. Defaults to false </param>
         /// <exception cref="NotImplementedException"></exception>
-        public virtual async Task OnSwitchPageCliked(int page, DynamicNavigatorRegistry registry, bool ignoreIndexOpt = false)
+        public virtual async Task<DynamicNavigatorRouteResult> OnSwitchPageCliked(int appId, DynamicNavigatorContainer container, DynamicNavigatorRegistry registry, Type callingComponent, bool ignoreIndexOpt = false)
         {
+            DynamicNavigatorRouteResult result = new DynamicNavigatorRouteResult { NavigatorContainer = container };
             try
             {
                 if (registry.DefaultsRoutes is not null)
                 {
-                    var component = registry.DefaultsRoutes[page];
+                    var component = registry.DefaultsRoutes[appId];
                     var pageRoute = registry.ApplicationRoutes.FirstOrDefault(v => v.Value.ComponentPath.Equals(component));
 
-                    var data = new DynamicNavigatorRoute
+                    var SinglePageRoute = new DynamicNavigatorRoute
                     {
                         AppId = pageRoute.Value.AppId,
                         AppName = pageRoute.Value.AppName,
                         Component = nameof(pageRoute.Value.ComponentName)
                     };
 
+                    result.NavigatorContainer = new DynamicNavigatorContainer { CurrentPageRoute = callingComponent.Assembly.GetType(pageRoute.Value.ComponentPath) };
+                    result.NavigatorRoute = SinglePageRoute;
+
                     if (!ignoreIndexOpt)
-                        await DynamicNavigatorIndexDbAddValue(DynamicNavigatorIndexDbKeyTypes.Page, data);
+                        await DynamicNavigatorIndexDbAddValue(DynamicNavigatorIndexDbKeyTypes.Page, SinglePageRoute);
 
                     NavigationManager.NavigateTo("/", forceLoad: true);
                 }
@@ -69,6 +75,8 @@ namespace Mendi.Blazor.DynamicNavigation
             {
                 Console.WriteLine(ex.ToString());
             }
+
+            return result;
         }
 
         /// <summary>
