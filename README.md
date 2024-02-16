@@ -170,7 +170,7 @@ Now run the project, and don't forget to check your browser's dev tool console f
 Cheers!
 
 
-https://github.com/danielmendie/Mendi.Blazor.DynamicNavigation/assets/66223776/0e6f1a56-d133-4604-83e7-69207cab3be2
+[NavigatorSampleVideo.mp4](https://github.com/danielmendie/Mendi.Blazor.DynamicNavigation/assets/66223776/0e6f1a56-d133-4604-83e7-69207cab3be2)
 
 
 
