@@ -7,10 +7,10 @@
 - [x] Previous Page History - *It can navigate back to previous pages visited*
 - [x] Nav Menu Binding - *Navigate to any routable page from your nav menu*
 - [x] Multi-App Switching - *Switch between multiple apps within your project. This is very useful for controlling the UI*
-- [ ] Handle catch-all url param redirect - *dev work*
+- [ ] Handle catch-all url param redirect - *still in dev work*
 
 ## 📖Installation
-To begin, install the **Mendi.Blazor.DynamicNavigation** Nuget package from Visual Studio or use the Command-line tool: 
+To begin, install the latest version of **Mendi.Blazor.DynamicNavigation** Nuget package from Visual Studio or use the Command-line tool: 
 `dotnet add package Mendi.Blazor.DynamicNavigation` 
 
 ## 🔧Configuration
@@ -115,7 +115,7 @@ Once your routable components are decorated. The rest is up to **Mendi.Blazor.Dy
 >>Command line tool for generating page routes and building routes for the dynamic navigation use in your application
 
 ## 📖Installation
-To install the **Mendi.Blazor.DynamicNavigation.CLI** tool, run `dotnet tool install -g Mendi.Blazor.DynamicNavigation.CLI` from command line
+To install the latest version of **Mendi.Blazor.DynamicNavigation.CLI** tool, run `dotnet tool install -g Mendi.Blazor.DynamicNavigation.CLI` from command line
 
 ## 🔧Configuration
 
