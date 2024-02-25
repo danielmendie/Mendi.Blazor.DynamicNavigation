@@ -43,9 +43,10 @@ namespace Mendi.Blazor.DynamicNavigation
         /// <param name="registry">Dynamic navigator registry</param>
         /// <param name="container">Dynamic navigation container</param>
         /// <param name="callingComponent">Type of calling component or class</param>
+        /// <param name="customUrl">Custom url to navigate to after app is switched - Defaults to / if not set</param>
         /// <param name="ignoreIndexOpt">Ignore persisting the dynamic navigation route data in IndexDB. Defaults to false </param>
-        /// <exception cref="NotImplementedException"></exception>
-        public virtual async Task<DynamicNavigatorRouteResult> OnSwitchPageCliked(int appId, DynamicNavigatorContainer container, DynamicNavigatorRegistry registry, Type callingComponent, bool ignoreIndexOpt = false)
+        /// <returns></returns>
+        public virtual async Task<DynamicNavigatorRouteResult> OnSwitchPageCliked(int appId, DynamicNavigatorContainer container, DynamicNavigatorRegistry registry, Type callingComponent, string? customUrl = null, bool ignoreIndexOpt = false)
         {
             DynamicNavigatorRouteResult result = new DynamicNavigatorRouteResult { NavigatorContainer = container };
             try
@@ -68,7 +69,10 @@ namespace Mendi.Blazor.DynamicNavigation
                     if (!ignoreIndexOpt)
                         await DynamicNavigatorIndexDbAddValue(DynamicNavigatorIndexDbKeyTypes.Page, SinglePageRoute);
 
-                    NavigationManager.NavigateTo("/", forceLoad: true);
+                    if (string.IsNullOrWhiteSpace(customUrl))
+                        NavigationManager.NavigateTo("/", forceLoad: true);
+                    else
+                        NavigationManager.NavigateTo(customUrl, forceLoad: true);
                 }
             }
             catch (Exception ex)
@@ -269,6 +273,7 @@ namespace Mendi.Blazor.DynamicNavigation
         /// <param name="ignoreIndexOpt">Ignore persisting the dynamic navigation route data in IndexDB. Defaults to false </param>
         /// <param name="container">Dynamic navigation container</param>
         /// <param name="registry">Dynamic navigation registry</param>
+        /// <returns></returns>
         public virtual async Task<DynamicNavigatorRouteResult> OnNavMenuItemCliked(string pageComponentName, DynamicNavigatorContainer container, DynamicNavigatorRegistry registry, Type callingComponent, List<NavigatorHistory> navigationHistoryList, bool ignoreIndexOpt = false)
         {
             DynamicNavigatorRouteResult result = new DynamicNavigatorRouteResult { NavigatorContainer = container };
@@ -306,6 +311,7 @@ namespace Mendi.Blazor.DynamicNavigation
         /// <param name="ignoreIndexOpt">Ignore persisting the dynamic navigation route data in IndexDB. Defaults to false </param>
         /// <param name="container">Dynamic navigation container</param>
         /// <param name="registry">Dynamic navigation registry</param>
+        /// <returns></returns>
         public virtual async Task<DynamicNavigatorRouteResult> OnNavMenuItemCliked(string pageComponentName, DynamicNavigatorContainer container, DynamicNavigatorRegistry registry, Type callingComponent, bool ignoreIndexOpt = false)
         {
             DynamicNavigatorRouteResult result = new DynamicNavigatorRouteResult { NavigatorContainer = container };
