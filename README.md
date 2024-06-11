@@ -7,6 +7,7 @@
 - [x] Previous Page History - *It can navigate back to previous pages visited*
 - [x] Nav Menu Binding - *Navigate to any routable page from your nav menu*
 - [x] Multi-App Switching - *Switch between multiple apps within your project. This is very useful for controlling the UI*
+- [x] Stoarge Option - *Choose page route storage method between local storage or index db
 - [ ] Handle catch-all url param redirect - *still in dev work*
 
 ## 📖Installation
@@ -19,6 +20,12 @@ Open your project's **Program.cs** file and replace this section ```await builde
 ```csharp
 var app = await builder.UseDynamicNavigator();
 await app.RunAsync();
+```
+
+By default, the dynamic navigator packages use the browser's local storage as its default storage setting. To use IndeDB, use the `StorageUtilityType.IndexDb` as
+a parameter to UseDynamicNavigator() call
+```csharp
+var app = await builder.UseDynamicNavigator(StorageUtilityType.IndexDb);
 ```
 
 Now create a `BaseComponent.cs` class in the pages folder or wherever would be convenient for you. You can change the `BaseComponent.cs` name of course.
