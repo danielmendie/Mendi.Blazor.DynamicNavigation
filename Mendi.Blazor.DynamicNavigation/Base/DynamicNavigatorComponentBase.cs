@@ -7,8 +7,8 @@ namespace Mendi.Blazor.DynamicNavigation
     {
         [Inject] protected private NavigationManager NavigationManager { get; set; } = null!;
         [Inject] protected private NavigatorAppSettings AppSettings { get; set; } = null!;
-        [Inject] protected private DynamicNavigatorIndexedDbAccessor? IndexedDbAccessor { get; set; }
-        [Inject] protected private ISyncLocalStorageService? LocalStorage { get; set; }
+        [Inject] protected private DynamicNavigatorIndexedDbAccessor IndexedDbAccessor { get; set; } = null!;
+        [Inject] protected private ISyncLocalStorageService LocalStorage { get; set; } = null!;
 
         readonly List<DynamicNavigatorHistory> NavigationHistory = [];
 
@@ -17,23 +17,7 @@ namespace Mendi.Blazor.DynamicNavigation
         /// Constructs an instance of <see cref="DynamicNavigatorComponentBase"/>.
         /// </summary>
         public DynamicNavigatorComponentBase()
-        {
-            if (AppSettings == null)
-            {
-                throw new ArgumentNullException(nameof(AppSettings));
-            }
-            else
-            {
-                if (AppSettings.StorageType == StorageUtilityType.LocalStorage)
-                {
-                    if (LocalStorage == null) throw new ArgumentNullException(nameof(LocalStorage));
-                }
-                else
-                {
-                    if (IndexedDbAccessor == null) throw new ArgumentNullException(nameof(IndexedDbAccessor));
-                }
-            }
-        }
+        { }
 
         /// <summary>
         /// Method invoked when scaffolding the page routes of applications

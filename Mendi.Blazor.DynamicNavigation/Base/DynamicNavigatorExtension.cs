@@ -8,37 +8,28 @@ namespace Mendi.Blazor.DynamicNavigation
     {
         public static async Task<WebAssemblyHost> UseDynamicNavigator(this WebAssemblyHostBuilder builder, StorageUtilityType storageType = StorageUtilityType.LocalStorage)
         {
-            builder.Services.AddSingleton<DynamicNavigatorContainer>();
-            builder.Services.AddSingleton<DynamicNavigatorRegistry>();
-
             //initialize settings
             var settings = new NavigatorAppSettings
             {
                 StorageType = storageType
             };
             builder.Services.AddSingleton(settings);
-
-            if (storageType == StorageUtilityType.LocalStorage)
-            {
-                builder.Services.AddBlazoredLocalStorage();
-            }
-            else
-            {
-                builder.Services.AddScoped<DynamicNavigatorIndexedDbAccessor>();
-            }
+            builder.Services.AddSingleton<DynamicNavigatorContainer>();
+            builder.Services.AddSingleton<DynamicNavigatorRegistry>();
+            builder.Services.AddScoped<DynamicNavigatorIndexedDbAccessor>();
+            builder.Services.AddBlazoredLocalStorage();
 
             var host = builder.Build();
 
-            if (storageType == StorageUtilityType.IndexDb)
+            using var scope = host.Services.CreateScope();
+            var navigatorAccessor = scope.ServiceProvider.GetService<DynamicNavigatorIndexedDbAccessor>();
+            if (navigatorAccessor is not null)
             {
-                using var scope = host.Services.CreateScope();
-                var navigatorAccessor = scope.ServiceProvider.GetService<DynamicNavigatorIndexedDbAccessor>();
-
-                if (navigatorAccessor is not null)
-                    await navigatorAccessor.InitializeAsync();
+                await navigatorAccessor.InitializeAsync();
             }
 
             return host;
         }
+
     }
 }
