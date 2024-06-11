@@ -22,7 +22,7 @@ var app = await builder.UseDynamicNavigator();
 await app.RunAsync();
 ```
 
-By default, the dynamic navigator packages use the browser's local storage as its default storage setting. To use IndeDB, use the `StorageUtilityType.IndexDb` as
+By default, the dynamic navigator uses the browser's local storage as its default storage setting. To use IndeDB, use the `StorageUtilityType.IndexDb` as
 a parameter to UseDynamicNavigator() call
 ```csharp
 var app = await builder.UseDynamicNavigator(StorageUtilityType.IndexDb);
