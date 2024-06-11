@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 
-namespace Mendi.Blazor.DynamicNavigation.Common
+namespace Mendi.Blazor.DynamicNavigation
 {
     //
     // Summary:

@@ -1,5 +1,4 @@
-﻿using Mendi.Blazor.DynamicNavigation.Common;
-using Microsoft.CodeAnalysis;
+﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Formatting;
@@ -122,7 +121,7 @@ ContinueProcess:
 
                 var sb = new StringBuilder();
                 sb.AppendLine("//add code logic before, after or between these lines depending on your use case");
-                sb.AppendLine("SinglePageRoute = await DynamicNavigatorIndexDbGetValue<DynamicNavigatorRoute>(DynamicNavigatorIndexDbKeyTypes.Page);");
+                sb.AppendLine("SinglePageRoute = await DynamicNavigatorGetStorageItem<DynamicNavigatorRoute>(DynamicNavigatorStorageKeyNameType.Page);");
                 sb.AppendLine("if (SinglePageRoute is null || string.IsNullOrWhiteSpace(SinglePageRoute?.Component))");
                 sb.AppendLine("{");
                 sb.AppendLine("    try");
@@ -133,7 +132,7 @@ ContinueProcess:
                 sb.AppendLine($"       var getPage = PageRouteRegistry.ApplicationRoutes.FirstOrDefault(v => v.Value.ComponentPath.Equals(componentPath));");
                 sb.AppendLine($"       var singlePageRoute = new DynamicNavigatorRoute{{AppId = getPage.Value.AppId,AppName = getPage.Value.AppName,Component = getPage.Value.ComponentName}};");
 
-                sb.AppendLine("        await DynamicNavigatorIndexDbAddValue(DynamicNavigatorIndexDbKeyTypes.Page, singlePageRoute);");
+                sb.AppendLine("        await DynamicNavigatorAddStorageItem(DynamicNavigatorStorageKeyNameType.Page, singlePageRoute);");
                 sb.AppendLine("    }");
                 sb.AppendLine("    catch (Exception ex)");
                 sb.AppendLine("    {");

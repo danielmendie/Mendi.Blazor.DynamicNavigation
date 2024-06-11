@@ -14,7 +14,7 @@
 		<RepositoryUrl>https://github.com/danielmendie/Mendi.Blazor.DynamicNavigation</RepositoryUrl>
 		<PackageTags>Web Assembly</PackageTags>
 		<PackageLicenseFile>LICENSE</PackageLicenseFile>
-		<Version>1.0.9</Version>
+		<Version>1.1.0</Version>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -34,6 +34,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<PackageReference Include="Blazored.LocalStorage" Version="4.5.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="8.0.1" />
 		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.1" />
 	</ItemGroup>

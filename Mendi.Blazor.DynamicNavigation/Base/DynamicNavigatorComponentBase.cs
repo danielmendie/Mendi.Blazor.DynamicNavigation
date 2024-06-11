@@ -1,19 +1,39 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using Blazored.LocalStorage;
+using Microsoft.AspNetCore.Components;
 
 namespace Mendi.Blazor.DynamicNavigation
 {
     public abstract class DynamicNavigatorComponentBase : ComponentBase
     {
         [Inject] protected private NavigationManager NavigationManager { get; set; } = null!;
-        [Inject] private DynamicNavigatorIndexedDbAccessor IndexedDbAccessor { get; set; } = null!;
+        [Inject] protected private NavigatorAppSettings AppSettings { get; set; } = null!;
+        [Inject] protected private DynamicNavigatorIndexedDbAccessor? IndexedDbAccessor { get; set; }
+        [Inject] protected private ISyncLocalStorageService? LocalStorage { get; set; }
 
-        private List<NavigatorHistory> NavigationHistory = [];
+        readonly List<DynamicNavigatorHistory> NavigationHistory = [];
 
 
         /// <summary>
         /// Constructs an instance of <see cref="DynamicNavigatorComponentBase"/>.
         /// </summary>
-        public DynamicNavigatorComponentBase() { }
+        public DynamicNavigatorComponentBase()
+        {
+            if (AppSettings == null)
+            {
+                throw new ArgumentNullException(nameof(AppSettings));
+            }
+            else
+            {
+                if (AppSettings.StorageType == StorageUtilityType.LocalStorage)
+                {
+                    if (LocalStorage == null) throw new ArgumentNullException(nameof(LocalStorage));
+                }
+                else
+                {
+                    if (IndexedDbAccessor == null) throw new ArgumentNullException(nameof(IndexedDbAccessor));
+                }
+            }
+        }
 
         /// <summary>
         /// Method invoked when scaffolding the page routes of applications
@@ -63,16 +83,32 @@ namespace Mendi.Blazor.DynamicNavigation
                         Component = nameof(pageRoute.Value.ComponentName)
                     };
 
-                    result.NavigatorContainer = new DynamicNavigatorContainer { CurrentPageRoute = callingComponent.Assembly.GetType(pageRoute.Value.ComponentPath) };
+                    result.NavigatorContainer = new DynamicNavigatorContainer
+                    {
+                        CurrentPageRoute = callingComponent.Assembly.GetType(pageRoute.Value.ComponentPath)
+                    };
                     result.NavigatorRoute = SinglePageRoute;
 
                     if (!ignoreIndexOpt)
-                        await DynamicNavigatorIndexDbAddValue(DynamicNavigatorIndexDbKeyTypes.Page, SinglePageRoute);
+                    {
+                        if (AppSettings.StorageType == StorageUtilityType.LocalStorage)
+                        {
+                            DynamicNavigatorLocalStorageAccessor.SetValue(LocalStorage!, DynamicNavigatorStorageKeyNameType.Page, SinglePageRoute);
+                        }
+                        else
+                        {
+                            await DynamicNavigatorAddStorageItem(DynamicNavigatorStorageKeyNameType.Page, SinglePageRoute);
+                        }
+                    }
 
                     if (string.IsNullOrWhiteSpace(customUrl))
-                        NavigationManager.NavigateTo("/", forceLoad: true);
+                    {
+                        NavigationManager.Refresh(forceReload: true);
+                    }
                     else
+                    {
                         NavigationManager.NavigateTo(customUrl, forceLoad: true);
+                    }
                 }
             }
             catch (Exception ex)
@@ -111,12 +147,31 @@ namespace Mendi.Blazor.DynamicNavigation
                     }
 
                     var comInfo = registry.ApplicationRoutes[$"{previousPage.Page}"];
-                    DynamicNavigatorRoute SinglePageRoute = new() { AppId = comInfo.AppId, AppName = comInfo.AppName, Component = previousPage.Page, Params = previousPage.Params ?? [] };
-                    result.NavigatorContainer = new DynamicNavigatorContainer { CurrentPageRoute = callingComponent.Assembly.GetType(comInfo.ComponentPath) };
+                    DynamicNavigatorRoute SinglePageRoute = new()
+                    {
+                        AppId = comInfo.AppId,
+                        AppName = comInfo.AppName,
+                        Component = previousPage.Page,
+                        Params = previousPage.Params ?? []
+                    };
+
+                    result.NavigatorContainer = new DynamicNavigatorContainer
+                    {
+                        CurrentPageRoute = callingComponent.Assembly.GetType(comInfo.ComponentPath)
+                    };
                     result.NavigatorRoute = SinglePageRoute;
 
                     if (!ignoreIndexOpt)
-                        await DynamicNavigatorIndexDbAddValue(DynamicNavigatorIndexDbKeyTypes.Page, SinglePageRoute);
+                    {
+                        if (AppSettings.StorageType == StorageUtilityType.LocalStorage)
+                        {
+                            DynamicNavigatorLocalStorageAccessor.SetValue(LocalStorage!, DynamicNavigatorStorageKeyNameType.Page, SinglePageRoute);
+                        }
+                        else
+                        {
+                            await DynamicNavigatorAddStorageItem(DynamicNavigatorStorageKeyNameType.Page, SinglePageRoute);
+                        }
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -137,7 +192,7 @@ namespace Mendi.Blazor.DynamicNavigation
         /// <param name="ignoreIndexOpt">Ignore persisting the dynamic navigation route data in IndexDB. Defaults to false </param>
         /// <param name="navigationHistoryList">Custom list of string for storing navigation history</param>
         /// <returns></returns>
-        public virtual async Task<DynamicNavigatorRouteResult> OnBackToPreviousPageClicked(DynamicNavigatorContainer container, DynamicNavigatorRegistry registry, Type callingComponent, List<NavigatorHistory> navigationHistoryList, bool ignoreIndexOpt = false)
+        public virtual async Task<DynamicNavigatorRouteResult> OnBackToPreviousPageClicked(DynamicNavigatorContainer container, DynamicNavigatorRegistry registry, Type callingComponent, List<DynamicNavigatorHistory> navigationHistoryList, bool ignoreIndexOpt = false)
         {
             DynamicNavigatorRouteResult result = new DynamicNavigatorRouteResult { NavigatorContainer = container };
             if (navigationHistoryList.Count > 1)
@@ -156,12 +211,31 @@ namespace Mendi.Blazor.DynamicNavigation
                     }
 
                     var comInfo = registry.ApplicationRoutes[$"{previousPage.Page}"];
-                    DynamicNavigatorRoute SinglePageRoute = new() { AppId = comInfo.AppId, AppName = comInfo.AppName, Component = previousPage.Page, Params = previousPage.Params ?? [] };
-                    result.NavigatorContainer = new DynamicNavigatorContainer { CurrentPageRoute = callingComponent.Assembly.GetType(comInfo.ComponentPath) };
+                    DynamicNavigatorRoute SinglePageRoute = new()
+                    {
+                        AppId = comInfo.AppId,
+                        AppName = comInfo.AppName,
+                        Component = previousPage.Page,
+                        Params = previousPage.Params ?? []
+                    };
+
+                    result.NavigatorContainer = new DynamicNavigatorContainer
+                    {
+                        CurrentPageRoute = callingComponent.Assembly.GetType(comInfo.ComponentPath)
+                    };
                     result.NavigatorRoute = SinglePageRoute;
 
                     if (!ignoreIndexOpt)
-                        await DynamicNavigatorIndexDbAddValue(DynamicNavigatorIndexDbKeyTypes.Page, SinglePageRoute);
+                    {
+                        if (AppSettings.StorageType == StorageUtilityType.LocalStorage)
+                        {
+                            DynamicNavigatorLocalStorageAccessor.SetValue(LocalStorage!, DynamicNavigatorStorageKeyNameType.Page, SinglePageRoute);
+                        }
+                        else
+                        {
+                            await DynamicNavigatorAddStorageItem(DynamicNavigatorStorageKeyNameType.Page, SinglePageRoute);
+                        }
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -198,16 +272,37 @@ namespace Mendi.Blazor.DynamicNavigation
                 }
 
                 var comInfo = registry.ApplicationRoutes[$"{page}"];
-                DynamicNavigatorRoute SinglePageRoute = new() { AppId = comInfo.AppId, AppName = comInfo.AppName, Component = page, Params = parameters ?? [] };
-                result.NavigatorContainer = new DynamicNavigatorContainer { CurrentPageRoute = callingComponent.Assembly.GetType(comInfo.ComponentPath) };
+                DynamicNavigatorRoute SinglePageRoute = new()
+                {
+                    AppId = comInfo.AppId,
+                    AppName = comInfo.AppName,
+                    Component = page,
+                    Params = parameters ?? []
+                };
+
+                result.NavigatorContainer = new DynamicNavigatorContainer
+                {
+                    CurrentPageRoute = callingComponent.Assembly.GetType(comInfo.ComponentPath)
+                };
                 result.NavigatorRoute = SinglePageRoute;
 
                 if (!ignoreIndexOpt)
-                    await DynamicNavigatorIndexDbAddValue(DynamicNavigatorIndexDbKeyTypes.Page, SinglePageRoute);
+                {
+                    if (AppSettings.StorageType == StorageUtilityType.LocalStorage)
+                    {
+                        DynamicNavigatorLocalStorageAccessor.SetValue(LocalStorage!, DynamicNavigatorStorageKeyNameType.Page, SinglePageRoute);
+                    }
+                    else
+                    {
+                        await DynamicNavigatorAddStorageItem(DynamicNavigatorStorageKeyNameType.Page, SinglePageRoute);
+                    }
+                }
 
-                var history = new NavigatorHistory { Page = page, Params = parameters ?? [] };
+                var history = new DynamicNavigatorHistory { Page = page, Params = parameters ?? [] };
                 if (NavigationHistory.Count == 0 || NavigationHistory[^1] != history)
+                {
                     NavigationHistory.Add(history);
+                }
             }
             catch (Exception ex)
             {
@@ -230,7 +325,7 @@ namespace Mendi.Blazor.DynamicNavigation
         /// <param name="container">Dynamic navigation container</param>
         /// <param name="registry">Dynamic navigation registry</param>
         /// <returns></returns>
-        public virtual async Task<DynamicNavigatorRouteResult> OnPageItemClicked(Dictionary<string, string> parameters, string page, DynamicNavigatorContainer container, DynamicNavigatorRegistry registry, Type callingComponent, List<NavigatorHistory> navigationHistoryList, bool ignoreIndexOpt = false)
+        public virtual async Task<DynamicNavigatorRouteResult> OnPageItemClicked(Dictionary<string, string> parameters, string page, DynamicNavigatorContainer container, DynamicNavigatorRegistry registry, Type callingComponent, List<DynamicNavigatorHistory> navigationHistoryList, bool ignoreIndexOpt = false)
         {
             DynamicNavigatorRouteResult result = new DynamicNavigatorRouteResult { NavigatorContainer = container };
             try
@@ -244,14 +339,33 @@ namespace Mendi.Blazor.DynamicNavigation
                 }
 
                 var comInfo = registry.ApplicationRoutes[$"{page}"];
-                DynamicNavigatorRoute SinglePageRoute = new() { AppId = comInfo.AppId, AppName = comInfo.AppName, Component = page, Params = parameters ?? [] };
-                result.NavigatorContainer = new DynamicNavigatorContainer { CurrentPageRoute = callingComponent.Assembly.GetType(comInfo.ComponentPath) };
+                DynamicNavigatorRoute SinglePageRoute = new()
+                {
+                    AppId = comInfo.AppId,
+                    AppName = comInfo.AppName,
+                    Component = page,
+                    Params = parameters ?? []
+                };
+
+                result.NavigatorContainer = new DynamicNavigatorContainer
+                {
+                    CurrentPageRoute = callingComponent.Assembly.GetType(comInfo.ComponentPath)
+                };
                 result.NavigatorRoute = SinglePageRoute;
 
                 if (!ignoreIndexOpt)
-                    await DynamicNavigatorIndexDbAddValue(DynamicNavigatorIndexDbKeyTypes.Page, SinglePageRoute);
+                {
+                    if (AppSettings.StorageType == StorageUtilityType.LocalStorage)
+                    {
+                        DynamicNavigatorLocalStorageAccessor.SetValue(LocalStorage!, DynamicNavigatorStorageKeyNameType.Page, SinglePageRoute);
+                    }
+                    else
+                    {
+                        await DynamicNavigatorAddStorageItem(DynamicNavigatorStorageKeyNameType.Page, SinglePageRoute);
+                    }
+                }
 
-                var history = new NavigatorHistory { Page = page, Params = parameters ?? [] };
+                var history = new DynamicNavigatorHistory { Page = page, Params = parameters ?? [] };
                 if (navigationHistoryList.Count == 0 || navigationHistoryList[^1] != history)
                     navigationHistoryList.Add(history);
             }
@@ -274,7 +388,7 @@ namespace Mendi.Blazor.DynamicNavigation
         /// <param name="container">Dynamic navigation container</param>
         /// <param name="registry">Dynamic navigation registry</param>
         /// <returns></returns>
-        public virtual async Task<DynamicNavigatorRouteResult> OnNavMenuItemCliked(string pageComponentName, DynamicNavigatorContainer container, DynamicNavigatorRegistry registry, Type callingComponent, List<NavigatorHistory> navigationHistoryList, bool ignoreIndexOpt = false)
+        public virtual async Task<DynamicNavigatorRouteResult> OnNavMenuItemCliked(string pageComponentName, DynamicNavigatorContainer container, DynamicNavigatorRegistry registry, Type callingComponent, List<DynamicNavigatorHistory> navigationHistoryList, bool ignoreIndexOpt = false)
         {
             DynamicNavigatorRouteResult result = new DynamicNavigatorRouteResult { NavigatorContainer = container };
             if (!string.IsNullOrWhiteSpace(pageComponentName) && callingComponent is not null)
@@ -282,14 +396,32 @@ namespace Mendi.Blazor.DynamicNavigation
                 try
                 {
                     var comInfo = registry.ApplicationRoutes[$"{pageComponentName}"];
-                    DynamicNavigatorRoute SinglePageRoute = new() { AppId = comInfo.AppId, AppName = comInfo.AppName, Component = pageComponentName };
-                    result.NavigatorContainer = new DynamicNavigatorContainer { CurrentPageRoute = callingComponent.Assembly.GetType(comInfo.ComponentPath) };
+                    DynamicNavigatorRoute SinglePageRoute = new()
+                    {
+                        AppId = comInfo.AppId,
+                        AppName = comInfo.AppName,
+                        Component = pageComponentName
+                    };
+
+                    result.NavigatorContainer = new DynamicNavigatorContainer
+                    {
+                        CurrentPageRoute = callingComponent.Assembly.GetType(comInfo.ComponentPath)
+                    };
                     result.NavigatorRoute = SinglePageRoute;
 
                     if (!ignoreIndexOpt)
-                        await DynamicNavigatorIndexDbAddValue(DynamicNavigatorIndexDbKeyTypes.Page, SinglePageRoute);
+                    {
+                        if (AppSettings.StorageType == StorageUtilityType.LocalStorage)
+                        {
+                            DynamicNavigatorLocalStorageAccessor.SetValue(LocalStorage!, DynamicNavigatorStorageKeyNameType.Page, SinglePageRoute);
+                        }
+                        else
+                        {
+                            await DynamicNavigatorAddStorageItem(DynamicNavigatorStorageKeyNameType.Page, SinglePageRoute);
+                        }
+                    }
 
-                    var history = new NavigatorHistory { Page = pageComponentName, Params = [] };
+                    var history = new DynamicNavigatorHistory { Page = pageComponentName, Params = [] };
                     if (navigationHistoryList.Count == 0 || navigationHistoryList[^1] != history)
                         navigationHistoryList.Add(history);
                 }
@@ -320,14 +452,32 @@ namespace Mendi.Blazor.DynamicNavigation
                 try
                 {
                     var comInfo = registry.ApplicationRoutes[$"{pageComponentName}"];
-                    DynamicNavigatorRoute SinglePageRoute = new() { AppId = comInfo.AppId, AppName = comInfo.AppName, Component = pageComponentName };
-                    result.NavigatorContainer = new DynamicNavigatorContainer { CurrentPageRoute = callingComponent.Assembly.GetType(comInfo.ComponentPath) };
+                    DynamicNavigatorRoute SinglePageRoute = new()
+                    {
+                        AppId = comInfo.AppId,
+                        AppName = comInfo.AppName,
+                        Component = pageComponentName
+                    };
+
+                    result.NavigatorContainer = new DynamicNavigatorContainer
+                    {
+                        CurrentPageRoute = callingComponent.Assembly.GetType(comInfo.ComponentPath)
+                    };
                     result.NavigatorRoute = SinglePageRoute;
 
                     if (!ignoreIndexOpt)
-                        await DynamicNavigatorIndexDbAddValue(DynamicNavigatorIndexDbKeyTypes.Page, SinglePageRoute);
+                    {
+                        if (AppSettings.StorageType == StorageUtilityType.LocalStorage)
+                        {
+                            DynamicNavigatorLocalStorageAccessor.SetValue(LocalStorage!, DynamicNavigatorStorageKeyNameType.Page, SinglePageRoute);
+                        }
+                        else
+                        {
+                            await DynamicNavigatorAddStorageItem(DynamicNavigatorStorageKeyNameType.Page, SinglePageRoute);
+                        }
+                    }
 
-                    var history = new NavigatorHistory { Page = pageComponentName, Params = [] };
+                    var history = new DynamicNavigatorHistory { Page = pageComponentName, Params = [] };
                     if (NavigationHistory.Count == 0 || NavigationHistory[^1] != history)
                         NavigationHistory.Add(history);
                 }
@@ -341,29 +491,69 @@ namespace Mendi.Blazor.DynamicNavigation
         }
 
         /// <summary>
-        /// Get data value persisted in index db
+        /// Get data value persisted in storage
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="key"></param>
         /// <returns></returns>
-        public async Task<T> DynamicNavigatorIndexDbGetValue<T>(string key) => await IndexedDbAccessor.GetValueAsync<T>(DynamicNavigatorIndexDbTableNameTypes.Navigator, key);
+        public async Task<T?> DynamicNavigatorGetStorageItem<T>(string key)
+        {
+            if (AppSettings.StorageType == StorageUtilityType.LocalStorage)
+            {
+                return DynamicNavigatorLocalStorageAccessor.GetValue<T>(LocalStorage!, key);
+            }
+            else
+            {
+                return await IndexedDbAccessor!.GetValueAsync<T>(DynamicNavigatorStorageKeyNameType.Navigator, key);
+            }
+        }
         /// <summary>
-        /// Persist data in browswer using index db
+        /// Persist data in browswer using storage
         /// </summary>
         /// <param name="key"></param>
         /// <param name="value"></param>
         /// <returns></returns>
-        public async Task DynamicNavigatorIndexDbAddValue(string key, object value) => await IndexedDbAccessor.SetValueAsync(DynamicNavigatorIndexDbTableNameTypes.Navigator, new { Id = key, value });
+        public async Task DynamicNavigatorAddStorageItem(string key, object value)
+        {
+            if (AppSettings.StorageType == StorageUtilityType.LocalStorage)
+            {
+                DynamicNavigatorLocalStorageAccessor.SetValue(LocalStorage!, key, value);
+            }
+            else
+            {
+                await IndexedDbAccessor!.SetValueAsync(DynamicNavigatorStorageKeyNameType.Navigator, new { Id = key, value });
+            }
+        }
         /// <summary>
-        /// Delete data persisted in index db
+        /// Delete data persisted in storage
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-        public async Task DynamicNavigatorIndexDbDeleteValue(string key) => await IndexedDbAccessor.RemoveValueAsync(DynamicNavigatorIndexDbTableNameTypes.Navigator, key);
+        public async Task DynamicNavigatorDeleteStorageItem(string key)
+        {
+            if (AppSettings.StorageType == StorageUtilityType.LocalStorage)
+            {
+                DynamicNavigatorLocalStorageAccessor.DeleteValue(LocalStorage!, key);
+            }
+            else
+            {
+                await IndexedDbAccessor!.RemoveValueAsync(DynamicNavigatorStorageKeyNameType.Navigator, key);
+            }
+        }
         /// <summary>
-        /// Clear out all data persisted in index db
+        /// Clear out all data persisted in storage
         /// </summary>
         /// <returns></returns>
-        public async Task DynamicNavigatorIndexDbClearValue() => await IndexedDbAccessor.ClearAllValueAsync(DynamicNavigatorIndexDbTableNameTypes.Navigator);
+        public async Task DynamicNavigatorClearStorage()
+        {
+            if (AppSettings.StorageType == StorageUtilityType.LocalStorage)
+            {
+                DynamicNavigatorLocalStorageAccessor.ClearStorage(LocalStorage!);
+            }
+            else
+            {
+                await IndexedDbAccessor!.ClearAllValueAsync(DynamicNavigatorStorageKeyNameType.Navigator);
+            }
+        }
     }
 }
