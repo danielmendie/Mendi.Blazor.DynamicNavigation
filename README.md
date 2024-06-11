@@ -7,7 +7,7 @@
 - [x] Previous Page History - *It can navigate back to previous pages visited*
 - [x] Nav Menu Binding - *Navigate to any routable page from your nav menu*
 - [x] Multi-App Switching - *Switch between multiple apps within your project. This is very useful for controlling the UI*
-- [x] Stoarge Option - *Choose page route storage method between local storage or index db*
+- [x] Storage Option - *Choose page route storage method between local storage or index db*
 - [ ] Handle catch-all url param redirect - *still in dev work*
 
 ## 📖Installation
