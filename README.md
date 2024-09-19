@@ -1,6 +1,11 @@
 > # Mendi.Blazor.DynamicNavigation
 >>This package allows dynamic routing in your Blazor application. It configures your app to route to pages within your application without changing URLs, making it truly a single-page app. It is safe and also prevents URL tempering and hijacking
 
+## 🧑‍💻Platforms
+- [x] Blazor Server
+- [x] Blazor WebAssembly
+- [x] Maui Blazor Hybrid
+
 ## 👏Features
 - [x] Static URL - *Urls do not change when you navigate to any routable page*
 - [x] Page Rentention - *It remembers the last page a user was on, even when the browser is refreshed or closed*
@@ -16,17 +21,16 @@ To begin, install the latest version of **Mendi.Blazor.DynamicNavigation** Nuget
 
 ## 🔧Configuration
 
-Open your project's **Program.cs** file and replace this section ```await builder.RunAsync()``` with
+Open your project's **Program.cs** file and add this section 
 ```csharp
-var app = await builder.UseDynamicNavigator();
-await app.RunAsync();
+builder.Services.AddBlazorDynamicNavigator(options =>
+{
+    options.StorageType = StorageUtilityType.LocalStorage;
+    options.IgnoreDataPesistOption = true;
+});
 ```
 
-By default, the dynamic navigator uses the browser's local storage as its default storage setting. To use IndeDB, use the `StorageUtilityType.IndexDb` as
-a parameter to UseDynamicNavigator() call
-```csharp
-var app = await builder.UseDynamicNavigator(StorageUtilityType.IndexDb);
-```
+You can specify the storage type to use i.e local storage or IndeDB. to use the indexDb option, set `options.StorageType` to `StorageUtilityType.IndexDb`
 
 Now create a `BaseComponent.cs` class in the pages folder or wherever would be convenient for you. You can change the `BaseComponent.cs` name of course.
 Inherit the `DynamicNavigatorComponentBase` class and add the `NavigatorBaseComponent` attribute to your base component class. Your class should look similar to this:
