@@ -1,5 +1,5 @@
 > # Mendi.Blazor.DynamicNavigation
->>This package allows dynamic routing in your Blazor application. It configures your app to route to pages within your application without changing URLs, making it truly a single-page app. It is safe and also prevents URL tempering and hijacking
+>>This package allows dynamic routing in your Blazor application. It configures your app to route to pages within your application without changing URLs or exposing URL parameters, making it truly a single-page app. It is safe and also prevents URL tampering and hijacking
 
 ## 🧑‍💻Platforms
 - [x] Blazor Server
@@ -8,12 +8,12 @@
 
 ## 👏Features
 - [x] Static URL - *Urls do not change when you navigate to any routable page*
-- [x] Page Rentention - *It remembers the last page a user was on, even when the browser is refreshed or closed*
+- [x] Page Retention - *It remembers the last page a user was on, even when the browser is refreshed or closed*
 - [x] Previous Page History - *It can navigate back to previous pages visited*
 - [x] Nav Menu Binding - *Navigate to any routable page from your nav menu*
 - [x] Multi-App Switching - *Switch between multiple apps within your project. This is very useful for controlling the UI*
 - [x] Storage Option - *Choose page route storage method between local storage or index db*
-- [ ] Handle catch-all url param redirect - *still in dev work*
+- [ ] Handle catch-all URL param redirect - *still in dev work*
 
 ## 📖Installation
 To begin, install the latest version of **Mendi.Blazor.DynamicNavigation** Nuget package from Visual Studio or use the Command-line tool: 
