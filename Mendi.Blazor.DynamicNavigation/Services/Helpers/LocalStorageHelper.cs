@@ -1,12 +1,9 @@
 ﻿using Blazored.LocalStorage;
 
-namespace Mendi.Blazor.DynamicNavigation
+namespace Mendi.Blazor.DynamicNavigation.Services.Helpers
 {
-    public class DynamicNavigatorLocalStorageAccessor
+    public sealed class LocalStorageHelper
     {
-        public DynamicNavigatorLocalStorageAccessor()
-        { }
-
         public static void SetValue<T>(ISyncLocalStorageService localStorageService, string sessionName, T Value)
         {
             localStorageService.SetItem(sessionName, Value);

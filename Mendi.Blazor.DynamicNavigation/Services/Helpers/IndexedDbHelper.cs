@@ -1,13 +1,13 @@
 ﻿using Microsoft.JSInterop;
 
-namespace Mendi.Blazor.DynamicNavigation
+namespace Mendi.Blazor.DynamicNavigation.Services.Helpers
 {
-    public class DynamicNavigatorIndexedDbAccessor : IDisposable, IAsyncDisposable
+    public class IndexedDbHelper : IDisposable, IAsyncDisposable
     {
         private Lazy<IJSObjectReference>? _accessorJsRef = new();
         private readonly IJSRuntime _jsRuntime;
 
-        public DynamicNavigatorIndexedDbAccessor(IJSRuntime jsRuntime)
+        public IndexedDbHelper(IJSRuntime jsRuntime)
         {
             _jsRuntime = jsRuntime;
         }

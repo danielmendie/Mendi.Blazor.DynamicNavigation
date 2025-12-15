@@ -1,13 +1,13 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace Mendi.Blazor.DynamicNavigation.Base
+namespace Mendi.Blazor.DynamicNavigation.Services.Helpers
 {
-    public class DynamicNavigatorIndexedDbInitializer : IHostedService
+    public class IndexedDbInitializerHelper : IHostedService
     {
         private readonly IServiceProvider _serviceProvider;
 
-        public DynamicNavigatorIndexedDbInitializer(IServiceProvider serviceProvider)
+        public IndexedDbInitializerHelper(IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider;
         }
@@ -15,7 +15,7 @@ namespace Mendi.Blazor.DynamicNavigation.Base
         public async Task StartAsync(CancellationToken cancellationToken)
         {
             using var scope = _serviceProvider.CreateScope();
-            var navigatorAccessor = scope.ServiceProvider.GetService<DynamicNavigatorIndexedDbAccessor>();
+            var navigatorAccessor = scope.ServiceProvider.GetService<IndexedDbHelper>();
             if (navigatorAccessor is not null)
             {
                 await navigatorAccessor.InitializeAsync();

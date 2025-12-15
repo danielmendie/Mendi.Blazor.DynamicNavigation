@@ -4,7 +4,7 @@ namespace Mendi.Blazor.DynamicNavigation
 {
     //
     // Summary:
-    //     Denotes the target property as an event callback candidate for OnPageItemClicked.
+    //     Denotes the target property as an event callback candidate for navigation.
     [AttributeUsage(AttributeTargets.Property, Inherited = false, AllowMultiple = false)]
     [Obfuscation(Exclude = true)]
     public class NavigatorClickEventAttribute : Attribute
@@ -12,13 +12,13 @@ namespace Mendi.Blazor.DynamicNavigation
         //
         // Summary:
         //     Sets the next page component to route to from this current page
-        private readonly string gotoComponent;
+        private readonly string routeTo;
 
-        public NavigatorClickEventAttribute(string gotoComponent)
+        public NavigatorClickEventAttribute(string routeTo)
         {
-            this.gotoComponent = gotoComponent;
+            this.routeTo = routeTo;
         }
 
-        public string NextRoutablePage => gotoComponent;
+        public string NextRoutablePage => routeTo;
     }
 }

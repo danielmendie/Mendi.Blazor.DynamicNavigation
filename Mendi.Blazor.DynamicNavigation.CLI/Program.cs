@@ -1,54 +1,49 @@
 ﻿using CommandLine;
-using Mendi.Blazor.DynamicNavigation.CLI;
+using Mendi.Blazor.DynamicNavigation.CLI.Commands;
+using Microsoft.Extensions.Logging;
 using System.Reflection;
 
 public class Program
 {
+    ILogger<Program> Logger { get; }
+
     static void Main(string[] args)
     {
-        // Parse command-line arguments
         try
         {
-            Parser.Default.ParseArguments<Options>(args)
+            Parser.Default.ParseArguments<CommandOptions>(args)
             .WithParsed(async options =>
             {
-                // Handle parsed options
                 await HandleOptions(options);
             })
             .WithNotParsed(errors =>
             {
-                // Handle parsing errors
                 HandleParsingErrors(errors);
             });
         }
         catch (Exception ex)
         {
-            // Close and flush the Serilog logger
-            Console.WriteLine($"Error occured while running engine tool: {ex.Message}");
+            Console.WriteLine($"Error occurred while running engine tool: {ex.Message}");
         }
     }
 
-    static async Task HandleOptions(Options options)
+    static async Task HandleOptions(CommandOptions options)
     {
-        // Implement logic based on parsed options
-        if (options.Command == "scaffold")
+        if (options.Command == "routes")
         {
-            // Check for additional subcommands and perform actions
-            if (options.Subcommand == "getpageroutes")
+            if (options.Subcommand == "generate")
             {
-                // Execute your method for adding page routes
-                var PageGeneratingEngine = new GetPageRoutes();
-                await PageGeneratingEngine.Execute(options.Path);
+                var engine = new GenerateRoutesCommand();
+                await engine.RunAsync(options);
             }
-            else if (options.Subcommand == "buildpageroutes")
+            else if (options.Subcommand == "build")
             {
-                // Execute your method for adding page routes
-                var PageBuildingEngine = new BuildPageRoutes();
-                await PageBuildingEngine.Execute(options.Force, options.Path);
+                var engine = new BuildRoutesCommand();
+                await engine.RunAsync(options);
             }
             else
             {
-                Console.WriteLine($"Invalid scaffold action: {options.Subcommand}");
+                Console.WriteLine($"Invalid route action: {options.Subcommand}");
             }
         }
         else if (options.Command == "version")

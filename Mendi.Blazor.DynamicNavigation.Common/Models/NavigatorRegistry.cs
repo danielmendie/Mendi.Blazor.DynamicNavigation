@@ -10,9 +10,8 @@
     //
     //   DefaultsRoutes:
     //     A dictionary list of default routes for each app.
-    public class DynamicNavigatorRegistry
+    public class NavigatorRegistry
     {
-        public Dictionary<string, DynamicNavigatorMetadata> ApplicationRoutes { get; set; } = [];
-        public Dictionary<int, string> DefaultsRoutes { get; set; } = [];
+        public List<RoutePageInfo> Routes { get; set; } = [];
     }
 }

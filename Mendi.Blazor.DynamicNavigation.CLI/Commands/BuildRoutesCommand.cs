@@ -1,43 +1,43 @@
-﻿using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
+﻿using Mendi.Blazor.DynamicNavigation.CLI.Helpers;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Formatting;
 using System.Text;
 
-namespace Mendi.Blazor.DynamicNavigation.CLI
+namespace Mendi.Blazor.DynamicNavigation.CLI.Commands
 {
-    public class BuildPageRoutes
+    public class BuildRoutesCommand
     {
 
-        public async Task Execute(bool force = false, string path = null)
+        public async Task<int> RunAsync(CommandOptions options)
         {
-            // Implement the logic for adding page routes
-            Console.WriteLine(">>> Mendi Blazor Dynamic Navigation Engine <<<");
+            UtilsHelper.Log("---------- Navigation Engine Started ----------");
 
-            if (string.IsNullOrWhiteSpace(path))
-                path = Directory.GetCurrentDirectory();
+            if (string.IsNullOrWhiteSpace(options.Path))
+                options.Path = Directory.GetCurrentDirectory();
 
-            Console.WriteLine($">>> Project directory: {path}");
-            Console.WriteLine($">>> Searching for base components....");
+            UtilsHelper.Log($"Project directory: {options.Path}", options.Verbose);
+            var projectInfo = ComponentHelper.GetProjectAssemblyInfo(options.Path);
 
-            var baseComponent = ComponentHelper.GetBaseComponetByAttribute(path);
-            if (string.IsNullOrWhiteSpace(baseComponent))
-                baseComponent = ComponentHelper.GetBaseComponetDefault(path, "BaseComponent.cs");
-
-            if (string.IsNullOrWhiteSpace(baseComponent))
+            if (options.Force || projectInfo == null)
             {
-                Console.WriteLine(">>> No Base Component file found in project directory");
-                return;
+                UtilsHelper.Log("Force build - Building project before route generation...", options.Verbose);
+                var ok = UtilsHelper.BuildProject(options.Path, configuration: "Debug");
+                if (!ok)
+                {
+                    UtilsHelper.Log("dotnet build failed. Aborting route generation.");
+                    return 1;
+                }
             }
 
-            await BuildRoutes(baseComponent, path, force);
-
-            Console.WriteLine(">>> Scaffold BuildPageRoutes completed <<<");
+            await BuildPageRoutes(options);
+            UtilsHelper.Log("---------- Navigation Engine Completed ----------");
+            return 0;
         }
 
-        private async Task BuildRoutes(string basePath, string path, bool isForce)
+        private async Task BuildPageRoutes(CommandOptions options)
         {
-            string[] lines = File.ReadAllLines(basePath);
+            var baseComponent = ComponentHelper.GetBaseComponentByAttribute(options);
+            string[] lines = File.ReadAllLines(baseComponent);
 
             // Find the starting line of the BuildPageRoutes method
             int startIndex = -1;
@@ -50,16 +50,15 @@ namespace Mendi.Blazor.DynamicNavigation.CLI
                 }
             }
 
-            if (startIndex != -1 && !isForce)
+            if (startIndex != -1 && !options.Force)
             {
-                //The BuildPageRoute method if exists might have a devs custom code, so prevent scaffolding which will remove every
-                //custom code and prompt the dev for response to carry on
-                Console.WriteLine(">>> BuildPageRoutes exists already. To explicitly force a new scaffold without prompt, specify the -f or --force parameter");
-                Console.WriteLine(">>> Do you want to continue with scaffold? (y/n)");
+                //The BuildPageRoute method if exists might have a devs custom code, so prevent scaffolding which will remove every custom code and prompt the dev for response to carry on
+                UtilsHelper.Log("BuildPageRoutes exists already. To explicitly force a new scaffold without prompt, specify the -f or --force parameter");
+                UtilsHelper.Log("Do you want to continue with scaffold? (y/n)");
                 var responseInput = Console.ReadLine();
                 if (responseInput.ToLower().Equals("y"))
                 {
-                    Console.WriteLine(">>> Continuing to scaffolding... custom dev code may be lost");
+                    UtilsHelper.Log("Continuing to scaffolding... custom dev code may be lost", options.Verbose);
                     goto ContinueProcess;
                 }
                 else
@@ -69,12 +68,18 @@ namespace Mendi.Blazor.DynamicNavigation.CLI
             }
 
 ContinueProcess:
+            if (options.DryRun)
+            {
+                UtilsHelper.Log($"Dry Run - skipping BuildPageRoutes method update.");
+                return;
+            }
+
             var helper = new ComponentHelper();
-            var routableComponents = ComponentHelper.GetRoutableComponents(path);
+            var routableComponents = ComponentHelper.GetRoutableComponents(options.Path);
 
             try
             {
-                List<RoutableComponentInfo> componentInfoList = [];
+                List<RoutePageInfo> componentInfoList = [];
 
                 foreach (var componentPath in routableComponents)
                 {
@@ -82,11 +87,11 @@ ContinueProcess:
                     var fileContent = File.ReadAllText(componentPath);
 
                     // Assuming .razor.cs file contains a class definition, extract its type.
-                    var (componentType, nameSpace) = await ComponentHelper.ExtractComponentTypeAsync(fileContent, path);
+                    var (componentType, nameSpace) = await ComponentHelper.ExtractComponentTypeAsync(fileContent, options.Path);
 
                     if (componentType == null)
                     {
-                        Console.WriteLine($">>> Failed to extract component type from the file content. Path: {componentPath}");
+                        UtilsHelper.Log($"Component type extraction failed. Path: {componentPath}");
                         return;
                     }
 
@@ -99,17 +104,16 @@ ContinueProcess:
                         foreach (NavigatorRoutableComponentAttribute attribute in attributes.Cast<NavigatorRoutableComponentAttribute>())
                         {
                             int appId = attribute.AppId;
-                            bool isDefault = attribute.IsDefaultPage;
-                            string appName = attribute.AppName;
+                            bool isDefault = attribute.IsDefault;
+                            string appName = attribute.PageName;
 
-                            componentInfoList.Add(new RoutableComponentInfo
+                            componentInfoList.Add(new RoutePageInfo
                             {
                                 ComponentType = componentType,
                                 AppId = appId,
                                 IsDefault = isDefault,
-                                FullName = fullyQualifiedName,
-                                Name = className,
-                                AppName = appName
+                                Component = className,
+                                PageName = appName
                             });
                         }
                     }
@@ -164,14 +168,14 @@ ContinueProcess:
                 sb.AppendLine("    }");
                 sb.AppendLine("}");
 
-                SaveGeneratedRoutes(sb.ToString(), basePath);
+                SaveGeneratedRoutes(sb.ToString(), baseComponent);
 
                 #endregion
 
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"<<<-------------------- {ex.Message} ----------------------->>>");
+                UtilsHelper.Log($"******* {ex.Message}", options.Verbose);
             }
 
         }
@@ -230,7 +234,7 @@ ContinueProcess:
                 // Write the modified content back to the file
                 File.WriteAllLines(filePath, lines);
 
-                FormatCode(filePath);
+                UtilsHelper.FormatCode(filePath, []);
             }
             else
             {
@@ -238,36 +242,5 @@ ContinueProcess:
             }
         }
 
-        private static void FormatCode(string filePath)
-        {
-            try
-            {
-                string fileContent = File.ReadAllText(filePath);
-
-                // Parse the syntax tree from the file content
-                SyntaxTree syntaxTree = CSharpSyntaxTree.ParseText(fileContent);
-                CompilationUnitSyntax root = syntaxTree.GetCompilationUnitRoot();
-
-                // Add missing using statements
-                var usings = UtilsHelper.AddMissingUsings(root,
-                [
-                    "Mendi.Blazor.DynamicNavigation"
-                ]);
-
-                // Format the syntax tree using Roslyn's Formatter
-                SyntaxNode formattedRoot = Formatter.Format(usings, new AdhocWorkspace());
-                SyntaxNode cleanedRoot = formattedRoot.NormalizeWhitespace();
-
-                // Write the formatted content back to the file
-                File.WriteAllText(filePath, cleanedRoot.ToFullString());
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error formatting code: {ex.Message}");
-            }
-        }
-
     }
-
-
 }

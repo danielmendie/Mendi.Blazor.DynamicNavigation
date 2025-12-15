@@ -11,32 +11,33 @@ namespace Mendi.Blazor.DynamicNavigation
     {
         //
         // Summary:
-        //     Gets or sets a value that determines whether the component is a default
+        //     Gets or sets a value that determines whether the component is a routable
         //     page for the application with the specified app Id.
         //
         // Remarks:
-        //     IsDefaultPage can be used on at most one component per application type.
-        private readonly bool isDefaultPage;
+        //     Makes the page the current default page for the specified app Id
+        //     IsDefault can be used on at most one component per application type.
+        private readonly bool isDefault;
         //
         // Summary:
-        //     Gets or sets a value that determines what application the routeable
+        //     Gets or sets a value that determines what application the routable
         //     component is for.
         private readonly int appId;
         //
         // Summary:
         //     Gets or sets a application name base on the appId.
-        private readonly string appName;
+        private readonly string pageName;
 
-        public NavigatorRoutableComponentAttribute(string appName, bool isDefault, int appId)
+        public NavigatorRoutableComponentAttribute(string pageName, bool isDefault, int appId = 0)
         {
-            this.appName = appName;
+            this.pageName = pageName;
             this.appId = appId;
-            this.isDefaultPage = isDefault;
+            this.isDefault = isDefault;
         }
 
-        public string AppName => appName;
+        public string PageName => pageName;
 
-        public bool IsDefaultPage => isDefaultPage;
+        public bool IsDefault => isDefault;
 
         public int AppId => appId;
     }

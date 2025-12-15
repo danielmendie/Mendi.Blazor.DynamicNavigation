@@ -9,11 +9,17 @@
     //     The current appId to switched to, defaults to 0. This is used for switching
     //     between multiple apps in the same project.
     //
-    //   AppName:
-    //     Application name to display on sites'.
+    //   Name:
+    //     Page name to display on sites.
     //
     //   Component:
     //     Name of the Component page to route to.
+    //
+    //   Path:
+    //     Component page full path.
+    //
+    //   IsDefault:
+    //     Makes the page a default page for the specified AppId.
     //
     //   Action:
     //     The default action to display for the component route. This is useful for 
@@ -23,13 +29,15 @@
     //
     //   Params:
     //     Parameters for the component page
-    public class DynamicNavigatorRoute
+    public class RoutePageInfo
     {
         public int AppId { get; set; }
-        public string AppName { get; set; } = null!;
+        public string PageName { get; set; } = null!;
+        public required Type ComponentType { get; init; }
         public string Component { get; set; } = null!;
         public int? Action { get; set; }
-        public Dictionary<string, string> Params { get; set; } = [];
+        public bool IsDefault { get; set; }
+        public Dictionary<string, object> Params { get; set; } = [];
     }
 
 }
