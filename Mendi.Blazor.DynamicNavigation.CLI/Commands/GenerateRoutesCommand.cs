@@ -19,13 +19,14 @@ namespace Mendi.Blazor.DynamicNavigation.CLI.Commands
 
             if (options.Force || projectInfo == null)
             {
-                UtilsHelper.Log("Force build - Building project before route generation...", options.Verbose);
+                UtilsHelper.Log("Build started...", options.Verbose);
                 var ok = UtilsHelper.BuildProject(options.Path, configuration: "Debug");
                 if (!ok)
                 {
                     UtilsHelper.Log("dotnet build failed. Aborting route generation.");
                     return 1;
                 }
+                UtilsHelper.Log("Build completed", options.Verbose);
             }
 
             UtilsHelper.Log($"Searching for routable components...", options.Verbose);
@@ -104,7 +105,7 @@ namespace Mendi.Blazor.DynamicNavigation.CLI.Commands
                 }
 
                 var sb = new StringBuilder();
-                sb.AppendLine(" RouteRegistry = new NavigatorRegistry");
+                sb.AppendLine(" NavigatorRegistry = new NavigatorRegistry");
                 sb.AppendLine("{");
                 sb.AppendLine("//routable components found for your app");
                 sb.AppendLine("    Routes = new()");
@@ -245,7 +246,7 @@ namespace Mendi.Blazor.DynamicNavigation.CLI.Commands
 
                 //CreatePageRouteContainer(basePath);
                 CreatePageRouteRegistry(basePath);
-                CreateOverrideOnInitialized(basePath);
+                CreateVirtualOnAppNavigationSetup(basePath);
                 AppendUIComponent(option.Path);
                 //CreateSinglePageRoute(basePath);
                 //await CreateOnBackToPreviousPageClicked(basePath);
@@ -265,7 +266,7 @@ namespace Mendi.Blazor.DynamicNavigation.CLI.Commands
 
         #region Helpers
 
-        private protected static void CreateOverrideOnInitialized(string filePath)
+        private protected static void CreateVirtualOnAppNavigationSetup(string filePath)
         {
             filePath = filePath.Replace('/', '\\');
 
@@ -277,7 +278,7 @@ namespace Mendi.Blazor.DynamicNavigation.CLI.Commands
                 int startIndex = -1;
                 for (int i = 0; i < lines.Length; i++)
                 {
-                    if (lines[i].Contains("protected override void OnInitialized()"))
+                    if (lines[i].Contains("protected override async Task OnAppNavigationSetup()"))
                     {
                         startIndex = i;
                         break;
@@ -305,10 +306,10 @@ namespace Mendi.Blazor.DynamicNavigation.CLI.Commands
 
                     // Generate the new method code
                     StringBuilder newMethodCode = new StringBuilder();
-                    newMethodCode.AppendLine("protected override void OnInitialized()");
+                    newMethodCode.AppendLine("protected override async Task OnAppNavigationSetup()");
                     newMethodCode.AppendLine("{");
                     newMethodCode.AppendLine("GetPageRoutes();");
-                    newMethodCode.AppendLine("base.OnInitialized();");
+                    newMethodCode.AppendLine("await base.OnAppNavigationSetup();");
                     newMethodCode.AppendLine("}");
 
                     if (startIndex != -1)
@@ -345,7 +346,7 @@ namespace Mendi.Blazor.DynamicNavigation.CLI.Commands
                 int startIndex = -1;
                 for (int i = 0; i < lines.Length; i++)
                 {
-                    if (lines[i].Contains("NavigatorRegistry RouteRegistry { get; set; }"))
+                    if (lines[i].Contains("NavigatorRegistry NavigatorRegistry { get; set; }"))
                     {
                         startIndex = i;
                         break;
@@ -373,7 +374,7 @@ namespace Mendi.Blazor.DynamicNavigation.CLI.Commands
 
                     // Generate the new method code
                     StringBuilder newMethodCode = new StringBuilder();
-                    newMethodCode.AppendLine("[Inject] public NavigatorRegistry RouteRegistry { get; set; } = null!;");
+                    newMethodCode.AppendLine("[Inject] public NavigatorRegistry NavigatorRegistry { get; set; } = null!;");
 
                     if (startIndex != -1)
                     {

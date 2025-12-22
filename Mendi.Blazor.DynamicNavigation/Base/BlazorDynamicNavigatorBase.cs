@@ -16,12 +16,12 @@ namespace Mendi.Blazor.DynamicNavigation
         /// </summary>
         protected bool CanGoBack => History.CanGoBack;
         /// <summary>
-        /// Asynchronously initializes the component and restores the state or navigates to the default view.
+        /// Asynchronously initializes the navigator and restores the state or navigates to the default view.
         /// </summary>
         /// <remarks>This method is invoked automatically by the Blazor framework during the component's
         /// initialization lifecycle. It ensures that the component is properly set up before rendering.</remarks>
         /// <returns></returns>
-        protected override async Task OnInitializedAsync()
+        protected virtual async Task OnAppNavigationSetup()
         {
             await RestoreOrNavigateToDefaultAsync();
         }
