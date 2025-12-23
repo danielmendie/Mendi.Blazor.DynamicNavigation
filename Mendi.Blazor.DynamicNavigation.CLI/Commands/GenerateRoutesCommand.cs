@@ -61,7 +61,7 @@ namespace Mendi.Blazor.DynamicNavigation.CLI.Commands
 
                 #region CodeGenerator
 
-                List<RoutePageInfo> componentList = [];
+                List<RoutePageInfo> routeComponents = [];
                 foreach (var componentPath in routeFilePaths)
                 {
                     //read file content
@@ -87,7 +87,7 @@ namespace Mendi.Blazor.DynamicNavigation.CLI.Commands
                             bool isDefault = attribute.IsDefault;
                             string pageName = attribute.PageName;
 
-                            componentList.Add(new RoutePageInfo
+                            routeComponents.Add(new RoutePageInfo
                             {
                                 ComponentType = componentType,
                                 AppId = appId,
@@ -103,9 +103,9 @@ namespace Mendi.Blazor.DynamicNavigation.CLI.Commands
                 }
 
                 var sb = new StringBuilder();
-                var totalComs = componentList.Count;
+                var totalComs = routeComponents.Count;
                 var loopComs = 1;
-                foreach (var component in componentList)
+                foreach (var component in routeComponents)
                 {
                     var properties = component.ComponentType.GetProperties()
                         .Where(p => p.GetCustomAttributes<ParameterAttribute>().Any())
@@ -121,72 +121,37 @@ namespace Mendi.Blazor.DynamicNavigation.CLI.Commands
 
                     if (properties.Any())
                     {
-                        sb.AppendLine($"            Params = new()");
-                        sb.AppendLine($"            {{");
+                        sb.AppendLine("Params = new()");
+                        sb.AppendLine("{");
 
                         var totalProps = properties.Count();
                         var loopProps = 1;
                         foreach (var property in properties)
                         {
-                            var attributes = property.GetCustomAttributes(typeof(NavigatorClickEventAttribute), false);
-
-                            if (attributes.Any())
+                            sb.AppendLine("{");
+                            sb.AppendLine($"\"{property.Name}\", \"Id\"");
+                            if (loopProps != totalProps)
                             {
-                                //if (property.PropertyType.IsGenericType)
-                                //{
-                                //    Type genericTypeDefinition = property.PropertyType.GetGenericTypeDefinition();
-                                //    if (genericTypeDefinition == typeof(EventCallback<>))
-                                //    {
-                                //        Type innerType = property.PropertyType.GetGenericArguments()[0];
-
-                                //        // Check if the inner type is Dictionary<string, string>
-                                //        if (innerType == typeof(Dictionary<string, string>))
-                                //        {
-                                //            foreach (NavigatorClickEventAttribute attribute in attributes)
-                                //            {
-                                //                string nextRoutablePage = attribute.NextRoutablePage;
-                                //                sb.AppendLine($"                {{");
-                                //                sb.AppendLine($"                    \"{property.Name}\", EventCallback.Factory.Create<Dictionary<string, string>>(this, e => OnMapPageItemClicked(e, nameof({nextRoutablePage})))");
-                                //                if (loopProps != totalProps)
-                                //                {
-                                //                    sb.AppendLine($"                }},");
-                                //                }
-                                //                else
-                                //                {
-                                //                    sb.AppendLine($"                }}");
-                                //                }
-                                //            }
-                                //        }
-                                //    }
-                                //}
+                                sb.AppendLine("},");
                             }
                             else
                             {
-                                sb.AppendLine($"                {{");
-                                sb.AppendLine($"                    \"{property.Name}\", \"Id\"");
-                                if (loopProps != totalProps)
-                                {
-                                    sb.AppendLine($"                }},");
-                                }
-                                else
-                                {
-                                    sb.AppendLine($"                }}");
-                                }
+                                sb.AppendLine("}");
                             }
 
                             loopProps++;
                         }
 
-                        sb.AppendLine($"            }}");
+                        sb.AppendLine("}");
                     }
 
                     if (loopComs != totalComs)
                     {
-                        sb.AppendLine($"    }},");
+                        sb.AppendLine("},");
                     }
                     else
                     {
-                        sb.AppendLine($"    }}");
+                        sb.AppendLine("}");
                     }
 
                     loopComs++;

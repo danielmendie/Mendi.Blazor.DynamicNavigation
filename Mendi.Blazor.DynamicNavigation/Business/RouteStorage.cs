@@ -21,6 +21,11 @@ namespace Mendi.Blazor.DynamicNavigation.Business
             Dictionary<string, string>? parameters,
             CancellationToken cancellationToken = default)
         {
+            if (route is null)
+            {
+                throw new ArgumentNullException(nameof(route));
+            }
+
             var payload = new StoredRoute
             {
                 AppId = route.AppId,

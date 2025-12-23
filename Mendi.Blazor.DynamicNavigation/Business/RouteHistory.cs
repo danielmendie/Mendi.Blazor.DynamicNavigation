@@ -23,6 +23,10 @@
         /// parameters are provided.</param>
         public void Record(RoutePageInfo route, Dictionary<string, string>? parameters)
         {
+            if (route is null)
+            {
+                throw new ArgumentNullException(nameof(route));
+            }
             _history.Add((route, parameters));
         }
         /// <summary>
