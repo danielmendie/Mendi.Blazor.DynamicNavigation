@@ -29,5 +29,13 @@
 
             return Task.FromResult<RoutePageInfo?>(route);
         }
+
+        public Task<RoutePageInfo?> GetRouteWithIdAsync(string componentName, int appId, CancellationToken cancellationToken = default)
+        {
+            var route = _routes.FirstOrDefault(r => r.AppId == appId &&
+                string.Equals(r.Component, componentName, StringComparison.Ordinal));
+
+            return Task.FromResult<RoutePageInfo?>(route);
+        }
     }
 }

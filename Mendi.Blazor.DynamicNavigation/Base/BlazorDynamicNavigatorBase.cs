@@ -38,7 +38,7 @@ namespace Mendi.Blazor.DynamicNavigation
             try
             {
                 var restored = await Storage.LoadCurrentRouteAsync();
-                if (restored is not null)
+                if (!Setting.IgnoreRouteHistory && restored is not null)
                 {
                     await NavigateInternalAsync(restored.Value.Route, restored.Value.Parameters);
                     return;

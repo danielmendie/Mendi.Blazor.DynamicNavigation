@@ -25,10 +25,8 @@ namespace Mendi.Blazor.DynamicNavigation.Tests.Tests
         {
             //arrange
             var registry = BuildRegistryResolver();
-            registry = new NavigatorRegistry
-            {
-                Routes = new()
-                {
+            registry.Routes.Clear();
+            registry.Routes.Add(
                     new RoutePageInfo
                     {
                         AppId = 0,
@@ -43,9 +41,7 @@ namespace Mendi.Blazor.DynamicNavigation.Tests.Tests
                                 "Id"
                             }
                         }
-                    }
-                }
-            };
+                    });
 
             var service = BuildRouteResolver();
 

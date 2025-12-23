@@ -1,5 +1,4 @@
-﻿using Mendi.Blazor.DynamicNavigation.CLI;
-using Mendi.Blazor.DynamicNavigation.CLI.Commands;
+﻿using Mendi.Blazor.DynamicNavigation.CLI.Commands;
 
 namespace Mendi.Blazor.DynamicNavigation.Tests.Tests
 {
@@ -15,7 +14,7 @@ namespace Mendi.Blazor.DynamicNavigation.Tests.Tests
                 Command = "routes",
                 Subcommand = "generate",
                 Path = @"C:\Users\Danie\OneDrive\Desktop\TestApp\TestApp",
-                Force = false,
+                Force = true,
                 Verbose = true,
                 DryRun = false
             };

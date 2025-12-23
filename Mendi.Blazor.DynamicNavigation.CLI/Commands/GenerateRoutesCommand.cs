@@ -105,12 +105,6 @@ namespace Mendi.Blazor.DynamicNavigation.CLI.Commands
                 }
 
                 var sb = new StringBuilder();
-                sb.AppendLine(" NavigatorRegistry = new NavigatorRegistry");
-                sb.AppendLine("{");
-                sb.AppendLine("//routable components found for your app");
-                sb.AppendLine("    Routes = new()");
-                sb.AppendLine("    {");
-
                 var totalComs = componentList.Count();
                 var loopComs = 1;
                 foreach (var component in componentList)
@@ -173,7 +167,7 @@ namespace Mendi.Blazor.DynamicNavigation.CLI.Commands
                             else
                             {
                                 sb.AppendLine($"                {{");
-                                sb.AppendLine($"                    \"{property.Name}\", \"Id\"  //value for Id will be auto substituted during navigation.");
+                                sb.AppendLine($"                    \"{property.Name}\", \"Id\"");
                                 if (loopProps != totalProps)
                                 {
                                     sb.AppendLine($"                }},");
@@ -203,57 +197,9 @@ namespace Mendi.Blazor.DynamicNavigation.CLI.Commands
                     loopComs++;
                 }
 
-                sb.AppendLine("    }");
-                //sb.AppendLine("    },");
-                //sb.AppendLine("    DefaultsRoutes = new()");
-                //sb.AppendLine("    {");
-
-                //var groupedComponents = componentList.GroupBy(info => info.AppId).OrderByDescending(f => f.Key);
-                //var totalApps = groupedComponents.Count();
-                //var loopTrail = 1;
-                //foreach (var group in groupedComponents)
-                //{
-                //    var defaultAppComponent = group.FirstOrDefault(info => info.IsDefault) ?? group.First();
-                //    if (totalApps == 1)
-                //    {
-                //        sb.AppendLine("    {");
-                //        sb.AppendLine($"        {defaultAppComponent.AppId}, \"{defaultAppComponent.FullName}\"");
-                //        sb.AppendLine("    }");
-                //    }
-                //    else
-                //    {
-                //        if (loopTrail != totalApps)
-                //        {
-                //            sb.AppendLine("    {");
-                //            sb.AppendLine($"        {defaultAppComponent.AppId}, \"{defaultAppComponent.FullName}\"");
-                //            sb.AppendLine("    },");
-                //        }
-                //        else
-                //        {
-                //            sb.AppendLine("    {");
-                //            sb.AppendLine($"        {defaultAppComponent.AppId}, \"{defaultAppComponent.FullName}\"");
-                //            sb.AppendLine("    }");
-                //        }
-                //    }
-
-                //    loopTrail++;
-                //}
-
-                //sb.AppendLine("    }");
-                sb.AppendLine("};");
-                //sb.AppendLine("await DynamicNavigatorIndexDbAddValue(DynamicNavigatorIndexDbKeyTypes.Routes, PageRouteRegistry);");
-                //sb.AppendLine("await BuildPageRoutes();");
-
-                //CreatePageRouteContainer(basePath);
                 CreatePageRouteRegistry(basePath);
-                CreateVirtualOnAppNavigationSetup(basePath);
+                CreateVirtualOnAppNavigationSetup(sb.ToString(), basePath);
                 AppendUIComponent(option.Path);
-                //CreateSinglePageRoute(basePath);
-                //await CreateOnBackToPreviousPageClicked(basePath);
-                //await CreateOnMapNavMenuClicked(basePath);
-                //await CreateOnMapPageItemClicked(basePath);
-                //await CreateOnMapAppSwitchClicked(basePath);
-                SaveGeneratedRoutes(sb.ToString(), basePath);
 
                 #endregion
 
@@ -266,7 +212,7 @@ namespace Mendi.Blazor.DynamicNavigation.CLI.Commands
 
         #region Helpers
 
-        private protected static void CreateVirtualOnAppNavigationSetup(string filePath)
+        private protected static void CreateVirtualOnAppNavigationSetup(string code, string filePath)
         {
             filePath = filePath.Replace('/', '\\');
 
@@ -308,7 +254,11 @@ namespace Mendi.Blazor.DynamicNavigation.CLI.Commands
                     StringBuilder newMethodCode = new StringBuilder();
                     newMethodCode.AppendLine("protected override async Task OnAppNavigationSetup()");
                     newMethodCode.AppendLine("{");
-                    newMethodCode.AppendLine("GetPageRoutes();");
+                    newMethodCode.AppendLine("NavigatorRegistry.Routes.Clear();");
+                    newMethodCode.AppendLine("NavigatorRegistry.Routes.AddRange(new List<RoutePageInfo>()");
+                    newMethodCode.AppendLine("{");
+                    newMethodCode.AppendLine($"   {code}");
+                    newMethodCode.AppendLine("});");
                     newMethodCode.AppendLine("await base.OnAppNavigationSetup();");
                     newMethodCode.AppendLine("}");
 
@@ -374,7 +324,7 @@ namespace Mendi.Blazor.DynamicNavigation.CLI.Commands
 
                     // Generate the new method code
                     StringBuilder newMethodCode = new StringBuilder();
-                    newMethodCode.AppendLine("[Inject] public NavigatorRegistry NavigatorRegistry { get; set; } = null!;");
+                    newMethodCode.AppendLine("[Inject] public NavigatorRegistry NavigatorRegistry { get; set; } = default!;");
 
                     if (startIndex != -1)
                     {
@@ -422,68 +372,68 @@ namespace Mendi.Blazor.DynamicNavigation.CLI.Commands
             File.WriteAllLines(indexPath, lines);
         }
 
-        private protected static void SaveGeneratedRoutes(string code, string filePath)
-        {
-            filePath = filePath.Replace('/', '\\');
+        //private protected static void SaveGeneratedRoutes(string code, string filePath)
+        //{
+        //    filePath = filePath.Replace('/', '\\');
 
-            if (File.Exists(filePath))
-            {
-                string[] lines = File.ReadAllLines(filePath);
+        //    if (File.Exists(filePath))
+        //    {
+        //        string[] lines = File.ReadAllLines(filePath);
 
-                // Find the starting line of the GetPageRoutes method
-                int startIndex = -1;
-                for (int i = 0; i < lines.Length; i++)
-                {
-                    if (lines[i].Contains("private void GetPageRoutes()"))
-                    {
-                        startIndex = i;
-                        break;
-                    }
-                }
+        //        // Find the starting line of the GetPageRoutes method
+        //        int startIndex = -1;
+        //        for (int i = 0; i < lines.Length; i++)
+        //        {
+        //            if (lines[i].Contains("private void GetPageRoutes()"))
+        //            {
+        //                startIndex = i;
+        //                break;
+        //            }
+        //        }
 
-                if (startIndex != -1)
-                {
-                    // Find the real ending brace of the GetPageRoutes method
-                    int endIndex = UtilsHelper.FindMatchingClosingBrace(lines, startIndex);
+        //        if (startIndex != -1)
+        //        {
+        //            // Find the real ending brace of the GetPageRoutes method
+        //            int endIndex = UtilsHelper.FindMatchingClosingBrace(lines, startIndex);
 
-                    // Remove existing GetPageRoutes method
-                    if (endIndex != -1)
-                    {
-                        lines = lines.Take(startIndex).Concat(lines.Skip(endIndex + 1)).ToArray();
-                    }
-                }
+        //            // Remove existing GetPageRoutes method
+        //            if (endIndex != -1)
+        //            {
+        //                lines = lines.Take(startIndex).Concat(lines.Skip(endIndex + 1)).ToArray();
+        //            }
+        //        }
 
-                // Find the index where the GetPageRoutes method was removed
-                int insertIndex = startIndex;
+        //        // Find the index where the GetPageRoutes method was removed
+        //        int insertIndex = startIndex;
 
-                // Generate the new method code
-                StringBuilder newMethodCode = new StringBuilder();
-                newMethodCode.AppendLine("private void GetPageRoutes()");
-                newMethodCode.AppendLine("{");
-                newMethodCode.AppendLine($"   {code}");
-                newMethodCode.AppendLine("}");
+        //        // Generate the new method code
+        //        StringBuilder newMethodCode = new StringBuilder();
+        //        newMethodCode.AppendLine("private void GetPageRoutes()");
+        //        newMethodCode.AppendLine("{");
+        //        newMethodCode.AppendLine($"   {code}");
+        //        newMethodCode.AppendLine("}");
 
-                if (startIndex != -1)
-                {
-                    // Insert the new method code
-                    lines = lines.Take(insertIndex).Concat(newMethodCode.ToString().Split('\n')).Concat(lines.Skip(insertIndex)).ToArray();
-                }
-                else
-                {
-                    lines = lines.Take(lines.Length - 1).Concat(newMethodCode.ToString().Split('\n')).Concat(new[] { "}" }).ToArray();
-                }
+        //        if (startIndex != -1)
+        //        {
+        //            // Insert the new method code
+        //            lines = lines.Take(insertIndex).Concat(newMethodCode.ToString().Split('\n')).Concat(lines.Skip(insertIndex)).ToArray();
+        //        }
+        //        else
+        //        {
+        //            lines = lines.Take(lines.Length - 1).Concat(newMethodCode.ToString().Split('\n')).Concat(new[] { "}" }).ToArray();
+        //        }
 
-                // Write the modified content back to the file
-                File.WriteAllLines(filePath, lines);
+        //        // Write the modified content back to the file
+        //        File.WriteAllLines(filePath, lines);
 
-                UtilsHelper.FormatCode(filePath, ProjectNameSpaces);
-            }
-            else
-            {
-                UtilsHelper.Log($"File not found: {filePath}");
-            }
+        //        UtilsHelper.FormatCode(filePath, ProjectNameSpaces);
+        //    }
+        //    else
+        //    {
+        //        UtilsHelper.Log($"File not found: {filePath}");
+        //    }
 
-        }
+        //}
 
         #endregion
     }

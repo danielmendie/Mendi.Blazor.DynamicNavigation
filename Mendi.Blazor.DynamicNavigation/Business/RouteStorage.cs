@@ -7,10 +7,13 @@ namespace Mendi.Blazor.DynamicNavigation.Business
     {
         private const string StorageKey = "Mendi.DynamicNavigator.CurrentRoute";
         private readonly ILocalStorageService _localStorage;
+        private readonly IRouteResolver _routeResolver;
 
-        public RouteStorage(ILocalStorageService localStorage)
+        public RouteStorage(ILocalStorageService localStorage,
+            IRouteResolver routeResolver)
         {
             _localStorage = localStorage;
+            _routeResolver = routeResolver;
         }
 
         public async Task SaveCurrentRouteAsync(
@@ -20,15 +23,15 @@ namespace Mendi.Blazor.DynamicNavigation.Business
         {
             var payload = new StoredRoute
             {
-                Route = route,
-                Parameters = parameters?.ToDictionary(kvp => kvp.Key, kvp => kvp.Value)
+                AppId = route.AppId,
+                Component = route.Component,
+                Parameters = parameters
             };
 
             await _localStorage.SetItemAsync(StorageKey, payload, cancellationToken);
         }
 
-        public async Task<(RoutePageInfo Route, Dictionary<string, string>? Parameters)?> LoadCurrentRouteAsync(
-            CancellationToken cancellationToken = default)
+        public async Task<(RoutePageInfo Route, Dictionary<string, string>? Parameters)?> LoadCurrentRouteAsync(CancellationToken cancellationToken = default)
         {
             var payload = await _localStorage.GetItemAsync<StoredRoute?>(StorageKey, cancellationToken);
             if (payload is null)
@@ -36,13 +39,20 @@ namespace Mendi.Blazor.DynamicNavigation.Business
                 return null;
             }
 
-            Dictionary<string, string>? parameters = payload.Parameters;
-            return (payload.Route, parameters);
+            var route = await _routeResolver.GetRouteWithIdAsync(payload.Component, payload.AppId, cancellationToken);
+            if (route is null)
+            {
+                return null;
+            }
+
+            var parameters = payload.Parameters ?? new Dictionary<string, string>();
+            return (route, parameters);
         }
 
         private sealed class StoredRoute
         {
-            public RoutePageInfo Route { get; set; } = default!;
+            public int AppId { get; set; }
+            public string Component { get; set; } = default!;
             public Dictionary<string, string>? Parameters { get; set; }
         }
     }
