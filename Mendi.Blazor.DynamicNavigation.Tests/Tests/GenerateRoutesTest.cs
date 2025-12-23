@@ -23,7 +23,7 @@ namespace Mendi.Blazor.DynamicNavigation.Tests.Tests
 
             Assert.DoesNotThrowAsync(async () =>
             {
-                await command.RunAsync(option);
+                await GenerateRoutesCommand.RunAsync(option);
             });
         }
 

@@ -1,12 +1,10 @@
 ﻿using CommandLine;
 using Mendi.Blazor.DynamicNavigation.CLI.Commands;
-using Microsoft.Extensions.Logging;
+using Mendi.Blazor.DynamicNavigation.CLI.Helpers;
 using System.Reflection;
 
 public class Program
 {
-    ILogger<Program> Logger { get; }
-
     static void Main(string[] args)
     {
         try
@@ -23,7 +21,7 @@ public class Program
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error occurred while running engine tool: {ex.Message}");
+            UtilsHelper.Log($"Error occurred while running engine tool: {ex.Message}");
         }
     }
 
@@ -33,33 +31,27 @@ public class Program
         {
             if (options.Subcommand == "generate")
             {
-                var engine = new GenerateRoutesCommand();
-                await engine.RunAsync(options);
-            }
-            else if (options.Subcommand == "build")
-            {
-                var engine = new BuildRoutesCommand();
-                await engine.RunAsync(options);
+                await GenerateRoutesCommand.RunAsync(options);
             }
             else
             {
-                Console.WriteLine($"Invalid route action: {options.Subcommand}");
+                UtilsHelper.Log($"Invalid command action: {options.Subcommand}");
             }
         }
         else if (options.Command == "version")
         {
             var version = Assembly.GetExecutingAssembly().GetName().Version;
-            Console.WriteLine($"version: {version}");
+            UtilsHelper.Log($"version: {version}");
         }
         else
         {
-            Console.WriteLine($"Invalid engine command: {options.Command}");
+            UtilsHelper.Log($"Invalid engine command: {options.Command}");
         }
     }
 
     static void HandleParsingErrors(IEnumerable<Error> errors)
     {
         // Handle parsing errors (display help, show error messages, etc.)
-        Console.WriteLine("Error parsing command-line arguments.");
+        UtilsHelper.Log("Error parsing command-line arguments.");
     }
 }

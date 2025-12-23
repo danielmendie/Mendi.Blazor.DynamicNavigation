@@ -18,7 +18,7 @@ namespace Mendi.Blazor.DynamicNavigation
         /// <returns>The updated <see cref="IServiceCollection"/> instance.</returns>
         public static IServiceCollection AddBlazorDynamicNavigator(this IServiceCollection services, Action<NavigatorSettings> configuration)
         {
-            ArgumentNullException.ThrowIfNull(configuration, "configuration");
+            ArgumentNullException.ThrowIfNull(configuration, nameof(configuration));
             NavigatorSettings options = new NavigatorSettings();
             configuration(options);
             services.AddBlazoredLocalStorage();
