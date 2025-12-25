@@ -1,0 +1,51 @@
+﻿<PageTitle>Delete My Account - My Country App</PageTitle>
+
+<div class="col-sm-8 col-xs-12 ml-auto mr-auto mt-auto mb-auto">
+    <h1>Delete My Account</h1>
+    <p class="text-primary mb-5"><b>We're Sorry to See You Go</b></p>
+
+    <p>
+        Before you decide to delete your account, here are a few things to consider:
+    </p>
+    <ul>
+        <li><b class="text-primary">Have feedback for us?</b> Let us know how we can improve your experience.</li>
+        <li><b class="text-primary">Missed opportunities?</b> We're constantly improving and adding new features to make things better for you. </li>
+    </ul>
+
+    <div class="row g-3 mt-1 mb-3">
+        <div class="col-12">
+            <div class="card shadow-none border mb-0" style="border:1px dashed red !important;">
+                <div class="card-body">
+                    <p class="text-muted mb-0">
+                        <strong>When you delete your account, all you data will be completely erased and that action can not be undone.</strong>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card" style="border:1px dashed red !important;">
+        <div class="card-header"><h5>Consent Form</h5></div>
+        <div class="card-body">
+            <div class="col-sm-6 col-xs-12 ml-auto mr-auto mt-auto mb-auto">
+                <EditForm Model="@EditContext" Context="EditFormContext" OnValidSubmit="@HandleValidSubmit">
+                    <DataAnnotationsValidator />
+
+                    <MudTextField @bind-Value="UserName" Label="Email address" InputMode="InputMode.text" T="string" HelperText="Your email used in signing in" HelperTextOnFocus="true" Immediate="true" For="() => EditContext.Email" />
+
+                    <MudButton Disabled="@IsLoading" Size="Size.Large" ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" Class="mt-2">
+                        @if (IsLoading)
+                        {
+                            <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                            <MudText Class="ms-2">Please Wait</MudText>
+                        }
+                        else
+                        {
+                            <MudText>Delete Account</MudText>
+                        }
+                    </MudButton>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+</div>

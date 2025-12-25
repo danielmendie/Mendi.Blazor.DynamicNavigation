@@ -175,67 +175,76 @@ namespace Mendi.Blazor.DynamicNavigation.CLI.Commands
         private protected static void CreateVirtualOnAppNavigationSetup(string code, string filePath)
         {
             filePath = filePath.Replace('/', '\\');
-            if (File.Exists(filePath))
+
+            if (!File.Exists(filePath))
             {
-                string[] lines = File.ReadAllLines(filePath);
+                UtilsHelper.Log($"File not found: {filePath}");
+                return;
+            }
 
-                int startIndex = -1;
-                for (int i = 0; i < lines.Length; i++)
+            var lines = File.ReadAllLines(filePath);
+
+            var methodSignature = "protected override async Task OnAppNavigationSetup()";
+            var startIndex = -1;
+
+            for (int i = 0; i < lines.Length; i++)
+            {
+                if (lines[i].Contains(methodSignature))
                 {
-                    if (lines[i].Contains("protected override async Task OnAppNavigationSetup()"))
-                    {
-                        startIndex = i;
-                        break;
-                    }
+                    startIndex = i;
+                    break;
                 }
+            }
 
-                bool proceed = true;
-                if (startIndex != -1) proceed = false;
-                if (startIndex != -1)
+            if (startIndex != -1)
+            {
+                int endIndex = UtilsHelper.FindMatchingClosingBrace(lines, startIndex);
+
+                if (endIndex != -1)
                 {
-                    int endIndex = UtilsHelper.FindMatchingClosingBrace(lines, startIndex);
-
-                    if (endIndex != -1)
-                    {
-                        lines = lines.Take(startIndex).Concat(lines.Skip(endIndex + 1)).ToArray();
-                    }
+                    lines = lines.Take(startIndex)
+                                 .Concat(lines.Skip(endIndex + 1))
+                                 .ToArray();
                 }
+            }
 
-                if (proceed)
-                {
-                    int insertIndex = startIndex;
+            int insertIndex = startIndex != -1 ? startIndex : lines.Length - 1;
 
-                    // Generate the new method code
-                    StringBuilder newMethodCode = new StringBuilder();
-                    newMethodCode.AppendLine("protected override async Task OnAppNavigationSetup()");
-                    newMethodCode.AppendLine("{");
-                    newMethodCode.AppendLine("NavigatorRegistry.Routes.Clear();");
-                    newMethodCode.AppendLine("NavigatorRegistry.Routes.AddRange(new List<RoutePageInfo>()");
-                    newMethodCode.AppendLine("{");
-                    newMethodCode.AppendLine($"   {code}");
-                    newMethodCode.AppendLine("});");
-                    newMethodCode.AppendLine("await base.OnAppNavigationSetup();");
-                    newMethodCode.AppendLine("}");
+            var sb = new StringBuilder();
+            sb.AppendLine("    protected override async Task OnAppNavigationSetup()");
+            sb.AppendLine("    {");
+            sb.AppendLine("        NavigatorRegistry.Routes.Clear();");
+            sb.AppendLine("        NavigatorRegistry.Routes.AddRange(new List<RoutePageInfo>()");
+            sb.AppendLine("        {");
+            sb.AppendLine($"            {code}");
+            sb.AppendLine("        });");
+            sb.AppendLine("        await base.OnAppNavigationSetup();");
+            sb.AppendLine("    }");
 
-                    if (startIndex != -1)
-                    {
-                        lines = lines.Take(insertIndex).Concat(newMethodCode.ToString().Split('\n')).Concat(lines.Skip(insertIndex)).ToArray();
-                    }
-                    else
-                    {
-                        lines = lines.Take(lines.Length - 1).Concat(newMethodCode.ToString().Split('\n')).Concat(new[] { "}" }).ToArray();
-                    }
+            var newMethodLines = sb.ToString()
+                                   .Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
 
-                    File.WriteAllLines(filePath, lines);
-
-                    UtilsHelper.FormatCode(filePath, ProjectNameSpaces);
-                }
+            if (startIndex != -1)
+            {
+                // method existed: insert at the original position
+                lines = lines.Take(insertIndex)
+                             .Concat(newMethodLines)
+                             .Concat(lines.Skip(insertIndex))
+                             .ToArray();
             }
             else
             {
-                UtilsHelper.Log($"File not found: {filePath}");
+                // method did not exist: insert before final "}"
+                lines = lines.Take(lines.Length - 1)
+                             .Concat(newMethodLines)
+                             .Concat(new[] { "}" })
+                             .ToArray();
             }
+
+            File.WriteAllLines(filePath, lines);
+            UtilsHelper.FormatCode(filePath, ProjectNameSpaces);
         }
+
 
         private protected static void CreatePageRouteRegistry(string filePath)
         {

@@ -1,0 +1,8 @@
+﻿@inherits LayoutComponentBase
+<CascadingValue Value="this">
+@Body
+</CascadingValue>
+<MudThemeProvider @bind-IsDarkMode="_isDarkMode"
+ObserveSystemThemeChange="true" />
+<MudSnackbarProvider />
+<MudDialogProvider />

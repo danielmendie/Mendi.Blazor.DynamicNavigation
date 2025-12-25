@@ -1,19 +1,23 @@
-> # Mendi.Blazor.DynamicNavigation
->>This package allows dynamic routing in your Blazor application. It configures your app to route to pages within your application without changing URLs or exposing URL parameters, making it truly a single-page app. It is safe and also prevents URL tampering and hijacking
+# Mendi.Blazor.DynamicNavigation
+
+[![NuGet Version](https://img.shields.io/nuget/v/Mendi.Blazor.DynamicNavigation.svg?style=flat&label=nuget)](https://www.nuget.org/packages/Mendi.Blazor.DynamicNavigation)
+[![NuGet Downloads](https://img.shields.io/nuget/dt/Mendi.Blazor.DynamicNavigation.svg?style=flat)](https://www.nuget.org/packages/Mendi.Blazor.DynamicNavigation)
+
+>This library lets you build **single‑URL, multi‑page** Blazor apps by routing between components without changing the browser address or exposing URL parameters. It also persists navigation state and helps prevent URL tampering and hijacking.
 
 ## 🧑‍💻Platforms
 - [x] Blazor Server
 - [x] Blazor WebAssembly
-- [x] Maui Blazor Hybrid
+- [x] MAUI Blazor Hybrid
 
 ## 👏Features
-- [x] Static URL - *Urls do not change when you navigate to any routable page*
-- [x] Page Retention - *It remembers the last page a user was on, even when the browser is refreshed or closed*
-- [x] Previous Page History - *It can navigate back to previous pages visited*
-- [x] Nav Menu Binding - *Navigate to any routable page from your nav menu*
-- [x] Multi-App Switching - *Switch between multiple apps within your project. This is very useful for controlling the UI*
-- [x] Storage Option - *Choose page route storage method between local storage or index db*
-- [ ] Handle catch-all URL param redirect - *still in dev work*
+- [x] Static URL - *Navigate between pages while the browser URL stays the same.*
+- [x] Page Retention - *Restore the last visited page after refresh or browser reopen.*
+- [x] Previous Page History - *Navigate back through previously visited dynamic pages.*
+- [x] Nav Menu Binding - *Trigger navigation from any menu/button via attributes.*
+- [x] Multi-App Switching - *Partition routes into logical “apps” using `appId`.*
+- [x] Storage Option - *Persist navigation state via LocalStorage*
+- [x] CLI Tool - *Generate and build route metadata from your project automatically.*
 
 ## 📖Installation
 To begin, install the latest version of **Mendi.Blazor.DynamicNavigation** Nuget package from Visual Studio or use the Command-line tool: 
@@ -23,157 +27,108 @@ To begin, install the latest version of **Mendi.Blazor.DynamicNavigation** Nuget
 
 Open your project's **Program.cs** file and add this section 
 ```csharp
-builder.Services.AddBlazorDynamicNavigator(options =>
-{
-    options.StorageType = StorageUtilityType.LocalStorage;
-    options.IgnoreDataPesistOption = true;
-});
+builder.Services.AddBlazorDynamicNavigator(option => option.IgnoreRouteHistory = false);
 ```
 
-You can specify the storage type to use i.e local storage or IndeDB. to use the indexDb option, set `options.StorageType` to `StorageUtilityType.IndexDb`
+**STEPS HIGHLIGHTED HERE CAN BE DONE AUTOMATICALLY USING THE CLI TOOL**
 
-Now create a `BaseComponent.cs` class in the pages folder or wherever would be convenient for you. You can change the `BaseComponent.cs` name of course.
-Inherit the `DynamicNavigatorComponentBase` class and add the `NavigatorBaseComponent` attribute to your base component class. Your class should look similar to this:
+1. Create a base class in the root directory and inherit the `BlazorDynamicNavigatorBase` class then add the `NavigatorBaseComponent` attribute to your base component class. Your class should look similar to this:
+
 ```csharp
 using Mendi.Blazor.DynamicNavigation;
-using Mendi.Blazor.DynamicNavigation.Common;
+using Microsoft.AspNetCore.Components;
 
 namespace Test.Pages;
 [NavigatorBaseComponent]
-public class BaseComponent : DynamicNavigatorComponentBase
+public class MyBaseComponent : BlazorDynamicNavigatorBase
 {
-
 }
 ```
-The `NavigatorBaseComponent` attribute should be specified on the class acting as your component base class **This is very important**
+The `NavigatorBaseComponent` attribute should be specified on the custom class acting as your component base class **This is very important**
 
-Open the `_Imports.razor` file and add the following lines of code
+2. Open the `_Imports.razor` file and add the following lines of code
 ``` csharp
 @using Mendi.Blazor.DynamicNavigation
-@inherits BaseComponent
+@inherits MyBaseComponent
 ```
-BaseComponent - This should be the name of your base component class(however you had called it)
+MyBaseComponent - This should be the name of your base component class(however you had called it)
 
-After that, add the **BlazorDynamicPageNavigator** component to the Home.razor or Index.razor file `<BlazorDynamicPageNavigator NavigatorContainer="PageRouteContainer" NavigatorRegistry="PageRouteRegistry" />`
+3. Add the **BlazorDynamicPageNavigator** component to the Home.razor or Index.razor file `<BlazorDynamicNavigator />`
+
+4. In the Home.razor or Index.razor override OnInitializedAsync() and call the OnAppNavigationSetup(). You only have to add this call once.
+```csharp
+protected override async Task OnInitializedAsync()
+{
+    await OnAppNavigationSetup();
+}
+```
 
 ## 🚀Using It
 
 The **Mendi.Blazor.DynamicNavigation** is used for configuring your project. You'll use class and property attributes to define your routable components and parameter properties. 
-To define a routable component, decorate it with the `NavigatorRoutableComponent` attribute, and decorate your callback event properties with the `NavigatorClickEvent` attribute. Here's a typical example
+To define a routable component, decorate it with the `NavigatorRoutableComponent` attribute. Here's a typical example
 
 ``` csharp
-using Mendi.Blazor.DynamicNavigation.Common;
+using Mendi.Blazor.DynamicNavigation;
 using Microsoft.AspNetCore.Components;
-using Test.Pages.HiJack;
 
-namespace Test.Pages.SampleHere
+namespace TestApp.Pages
 {
-    [NavigatorRoutableComponent(appName: "Home Page", isDefault: false, appId: 1)]
-    public partial class IndexPage
+    [NavigatorRoutableComponent("Sample", true)]
+    public partial class Sample
     {
-        [Parameter]
-        [NavigatorClickEvent(gotoComponent: nameof(Calculator))]
-        public EventCallback<Dictionary<string, string>> OnGotoCalculator { get; set; }
+        [Parameter] public string Username { get; set; } = null!;
 
-        async Task OnOpenCalculatorButtonClicked()
-        {
-            Dictionary<string, string> data = new()
-            {
-                { "DisplayName", "Daniel Mendie" },
-                { "Operation", "Multiplication" }
-            };
-            await OnGotoCalculator.InvokeAsync(data);
-        }
     }
 }
 ```
-**NavigatorRoutableComponent** - This attribute requires three parameters; appName(string: name of the component or app), isDefault(bool: indicates if the component is the default route for the app Id), appId(int: used to categorize your app into different sub apps)
+**NavigatorRoutableComponent** - This attribute requires three parameters; pageName(string: name of the page), isDefault(bool: indicates if the component is the default route for the app Id), appId - optional(int: used to categorize your app into different sub apps)
 
-**NavigatorClickEvent** - This attribute requires one parameter; gotoComponent(string: the name of the next routable component to navigate to). This attribute should be applied to EventCallback properties.
-
-And here's what the `Calculator.razor.cs` file would look like
+To navigate to the sample page you call `NavigateToAsync` and pass the component name and its parameters if any
 ``` csharp
-using Mendi.Blazor.DynamicNavigation.Common;
-using Microsoft.AspNetCore.Components;
-using Test.Pages.SampleHere;
-
-namespace Test.Pages.HiJack
-{
-    [NavigatorRoutableComponent(appName: "Calculator", isDefault: false, appId: 1)]
-    public partial class Calculator
-    {
-        [Parameter] public string DisplayName { get; set; }
-        [Parameter] public string Operation { get; set; }
-
-       [Parameter]
-       [NavigatorClickEvent(gotoComponent: nameof(IndexPage))]
-       public EventCallback<Dictionary<string, string>> OnGotoIndex { get; set; }
-
-        async Task OnBackButtonClicked()
-        {
-            Dictionary<string, string> data = [];
-            await OnGotoIndex.InvokeAsync(data);
-        }
-    }
-}
+  await NavigateToAsync(nameof(Sample), new Dictionary<string, string> { { "Username", "Daniel Mendie" } });
 
 ```
 
 Once your routable components are decorated. The rest is up to **Mendi.Blazor.DynamicNavigation.CLI** tool to complete😉
 
 
-> # Mendi.Blazor.DynamicNavigation.CLI
->>Command line tool for generating page routes and building routes for the dynamic navigation use in your application
+
+# Mendi.Blazor.DynamicNavigation.CLI
+>Command line tool for generating page routes for the dynamic navigation use in your application
+
+[![NuGet Version](https://img.shields.io/nuget/v/Mendi.Blazor.DynamicNavigation.CLI.svg?style=flat&label=nuget)](https://www.nuget.org/packages/Mendi.Blazor.DynamicNavigation.CLI)
+[![NuGet Downloads](https://img.shields.io/nuget/dt/Mendi.Blazor.DynamicNavigation.CLI.svg?style=flat)](https://www.nuget.org/packages/Mendi.Blazor.DynamicNavigation.CLI)
 
 ## 📖Installation
 To install the latest version of **Mendi.Blazor.DynamicNavigation.CLI** tool, run `dotnet tool install -g Mendi.Blazor.DynamicNavigation.CLI` from command line
 
-## 🔧Configuration
-
-Add a `DynamicNavigator.config` with the following code
-```
-<?xml version="1.0" encoding="utf-8" ?>
-<configuration>
-	<appSettings>
-		<add key="ProjectsTargetAssemblyPath" value="path\to\your\projects\dll\Test.dll" />
-	</appSettings>
-</configuration>
-
-```
-Replace the value with the actual path to your project's .dll directory
 
 ## 🚀Using It
 
-The CLI is responsible for generating route pages and building them. To use it, open command-line tool to the directory of your project to run the following commands:
+The CLI is responsible for generating route pages and binding them. To use it, open command-line tool to the directory of your project to run the following commands:
 
 - To generate route pages
 ```
-dynamicnav-engine scaffold getpageroutes
+dynamicnav-engine routes generate
 ```
 
-You can likewise open the command-line tool from any location to run this command but with the `-p` or `--path` 
+Other additional command flags include:
+
+Point to a different project path using `-p` or `--path` 
 ```
-dynamicnav-engine scaffold getpageroutes -p path\to\your\projet\directory
+dynamicnav-engine routes generate --path path\to\your\projet\directory
+```
+Force build project before generating routes using `-f ` or `--force`
+```
+dynamicnav-engine routes generate --force
+```
+Verbose logging using `-v` or `--verbose`
+```
+dynamicnav-engine routes generate --verbose
 ```
 
-- To build route pages
-```
-dynamicnav-engine scaffold buildpageroutes
-```
-You can likewise open the command-line tool from any location to run this command but with the `-p` or `--path` 
-```
-dynamicnav-engine scaffold buildpageroutes -p path\to\your\projet\directory
-```
-
-Once the command runs successfully, your BaseComponent class will be populated with the required methods.
-
-Lastly, Open the `Home.razor.cs` file and add the following code
-``` csharp
-protected override async Task OnInitializedAsync()
-{
-    await GetPageRoutes();
-}
-```
+Once the command runs successfully, your BaseNavigator class will be populated with the routes.
 
 Now run the project, and don't forget to check your browser's dev tool console for extra log information if you ever get into an issue
 
@@ -182,9 +137,4 @@ Cheers!
 
 
 [NavigatorSampleVideo.mp4](https://github.com/danielmendie/Mendi.Blazor.DynamicNavigation/assets/66223776/0e6f1a56-d133-4604-83e7-69207cab3be2)
-
-
-
-
-
 

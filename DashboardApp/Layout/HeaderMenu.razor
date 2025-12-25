@@ -1,0 +1,120 @@
+﻿
+<DemoScriptLoader @ref=@scriptLoader Code="
+function OpenMenu() {
+    var buttonOpen =document.getElementById('mobile-collapse');
+    buttonOpen.click();
+}
+" />
+
+
+<nav class="pc-sidebar">
+    <div class="navbar-wrapper">
+        <div class="m-header">
+            <a class="b-brand text-primary">
+                <img src="assets/images/global-icon.png" class="logo-lg" alt="logo" height="40">
+                <span class="badge bg-light-success rounded-pill ms-2 theme-version">v1.0</span>
+            </a>
+        </div>
+        <div class="navbar-content">
+            <div class="card pc-user-card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <MudIcon Icon="@Icons.Material.TwoTone.Verified" Class="text-primary" />
+                        </div>
+                        <div class="flex-grow-1 ms-3 me-2">
+                            <h6 class="mb-0 truncate-text">@(CurrentUser.Name ?? CurrentUser.Email)</h6>
+                            <small class="text-primary"> Visitor</small>
+                        </div>
+                        <a class="btn btn-icon btn-link-secondary avtar" data-bs-toggle="collapse" href="#pc_sidebar_userlink">
+                            <svg class="pc-icon"><use xlink:href="#custom-sort-outline"></use></svg>
+                        </a>
+                    </div>
+                    <div class="collapse pc-user-links" id="pc_sidebar_userlink">
+                        <div class="pt-3">
+                            <a class="@(IsMenuPage(nameof(AccountStart)) ? "text-primary" : "")" @onclick:preventDefault @onclick="() => OnMenuItemClicked(nameof(AccountStart))"><i class="ti ti-user"></i> <span>Account</span> </a>
+
+                            <a @onclick:preventDefault @onclick="Logout"><i class="ti ti-power"></i> <span>Logout</span></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <ul class="pc-navbar">
+                <li class="pc-item pc-caption"><label>My Space</label></li>
+                @{
+                    foreach (var item in MenuItems)
+                    {
+                        <li class="pc-item @(IsMenuPage(item.Path) ? "active" : "")">
+                            <a @onclick:preventDefault @onclick="() => OnMenuItemClicked(item.Path)" class="pc-link">
+                                @if (item.Path == nameof(StartPage))
+                                {
+                                    <span class="pc-micon"><svg class="pc-icon"><use xlink:href="#custom-home"></use></svg> </span>
+                                }
+                                else if (item.Path == nameof(CountryStart))
+                                {
+                                    <span class="pc-micon"><svg class="pc-icon"><use xlink:href="#custom-flag"></use></svg> </span>
+                                }
+                                else if (item.Path == nameof(FavoriteStart))
+                                {
+                                    <span class="pc-micon"><svg class="pc-icon"><use xlink:href="#custom-notification-status"></use></svg> </span>
+                                }
+                                else if (item.Path == nameof(SupportStart))
+                                {
+                                    <span class="pc-micon"><svg class="pc-icon"><use xlink:href="#custom-24-support"></use></svg> </span>
+                                }
+                                else if (item.Path == nameof(AboutStart))
+                                {
+                                    <span class="pc-micon"><svg class="pc-icon"><use xlink:href="#custom-notification-status"></use></svg> </span>
+                                }
+                                <span class="pc-mtext">@item.Name</span>
+                            </a>
+                        </li>
+                    }
+
+                    IsLayoutComplete = true;
+                }
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<header class="pc-header @(IsHeader ? "invisible" : "visible")">
+    <div class="header-wrapper" style="padding: 0 15px 0px 5px;">
+        <div class="me-auto pc-mob-drp">
+            <ul class="list-unstyled">
+                <!-- ======= Menu collapse Icon ===== -->
+                <li class="pc-h-item pc-sidebar-collapse">
+                    <MudChip T="string" Icon="@Icons.Material.TwoTone.Menu" Class="pc-sidebar-popup" Size="Size.Large" Variant="Variant.Text" Text="@Route?.PageName" Ripple="false" Label="true" id="sidebar-hide" Style="background-color:transparent;" />
+                </li>
+                <li class="pc-h-item pc-sidebar-popup" @onclick="OnHamburgerMenuClicked">
+                    <MudChip T="string" Icon="@Icons.Material.TwoTone.Menu" Class="pc-sidebar-popup" Size="Size.Large" Variant="Variant.Text" Text="@Route?.PageName" Ripple="false" Label="true" id="mobile-collapse" Style="background-color:transparent;" />
+                </li>
+            </ul>
+        </div>
+
+        <!-- [Mobile Media Block end] -->
+        <div class="ms-auto">
+            <ul class="list-unstyled">
+                @if (CanGoBack)
+                {
+                    <li class="dropdown pc-h-item">
+                        <MudChip T="string" Icon="@Icons.Material.TwoTone.ArrowBackIos" Class="pc-sidebar-popup" Size="Size.Medium" Variant="Variant.Outlined" Text="Back" Ripple="false" id="sidebar-hide" Style="background-color:transparent;" OnClick="GoBackAsync" />
+                    </li>
+                }
+                @if (!IsMenuPage(nameof(CountryStart)))
+                {
+                    <li class="dropdown pc-h-item">
+                        <a @onclick:preventDefault @onclick="() => OnMenuItemClicked(nameof(CountryStart))" class="pc-head-link arrow-none me-0" role="button"><MudIcon Icon="@Icons.Material.TwoTone.Search" Size="Size.Large" /></a>
+                    </li>
+                }
+                <li class="dropdown pc-h-item">
+                    <a @onclick:preventDefault @onclick="() => OnMenuItemClicked(nameof(FavoriteStart))" class="pc-head-link arrow-none me-0" role="button"><MudIcon Icon="@Icons.Material.TwoTone.PushPin" Size="Size.Large" /></a>
+                </li>
+                <li class="dropdown pc-h-item">
+                    <a @onclick:preventDefault @onclick="() => OnMenuItemClicked(nameof(SwitchPage))" class="pc-head-link arrow-none me-0" role="button"><MudIcon Icon="@Icons.Material.TwoTone.Bolt" Size="Size.Large" Color="Color.Primary" /></a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</header>

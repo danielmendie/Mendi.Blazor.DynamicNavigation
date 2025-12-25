@@ -1,0 +1,34 @@
+[
+  {
+    "TemplateCode": "minimal_main",
+    "TemplateSubject": "{SUBJECT}",
+    "TemplateType": 1,
+    "IsDefault": 1,
+    "Placeholder": "SUBJECT,CLIENT_MESSAGE",
+    "TemplateBody": ""
+  },
+  {
+    "TemplateCode": "material_main",
+    "TemplateSubject": "{SUBJECT}",
+    "TemplateType": 1,
+    "IsDefault": 0,
+    "Placeholder": "SUBJECT,CLIENT_MESSAGE",
+    "TemplateBody": ""
+  },
+  {
+    "TemplateCode": "minimal_followup",
+    "TemplateSubject": "Have you had a chance to review your CRO summary",
+    "TemplateType": 2,
+    "IsDefault": 1,
+    "Placeholder": "CLIENT_NAME,DOMAIN_NAME",
+    "TemplateBody": ""
+  },
+  {
+    "TemplateCode": "material_followup",
+    "TemplateSubject": "Let’s review your CRO opportunities — 5 mins this week?",
+    "TemplateType": 2,
+    "IsDefault": 0,
+    "Placeholder": "CLIENT_NAME,DOMAIN_NAME",
+    "TemplateBody": ""
+  }
+]

@@ -121,7 +121,7 @@ namespace Mendi.Blazor.DynamicNavigation
                 return;
             }
 
-            await NavigateInternalAsync(previous.Value.Route, previous.Value.Parameters);
+            await NavigateInternalAsync(previous.Value.Route, previous.Value.Parameters, true);
         }
         /// <summary>
         /// Invoked before navigation to a new route occurs.
@@ -164,11 +164,11 @@ namespace Mendi.Blazor.DynamicNavigation
         /// <param name="route">The route information representing the target page.</param>
         /// <param name="parameters">An optional dictionary of parameters to pass to the route. Can be <see langword="null"/>.</param>
         /// <returns></returns>
-        private async Task NavigateInternalAsync(RoutePageInfo route, Dictionary<string, string>? parameters = null)
+        private async Task NavigateInternalAsync(RoutePageInfo route, Dictionary<string, string>? parameters = null, bool ignoreHistoryOnPrevious = false)
         {
             await OnBeforeNavigateAsync(route, parameters);
 
-            if (!Setting.IgnoreRouteHistory)
+            if (!ignoreHistoryOnPrevious && !Setting.IgnoreRouteHistory)
             {
                 History.Record(route, parameters);
             }

@@ -36,7 +36,7 @@ namespace Mendi.Blazor.DynamicNavigation.Tests.Tests.Business
             Assert.That(hasHistory, Is.EqualTo(true));
         }
 
-        [Test]
+        [Test, Order(2)]
         public void RouteHistory_GetPrevious_ShouldReturnPreviousRoute_Successfully()
         {
             //arrange
@@ -61,11 +61,13 @@ namespace Mendi.Blazor.DynamicNavigation.Tests.Tests.Business
             service.Record(route2, null);
             //act
             var previousRoute = service.GetPrevious();
+            var canGoBack = service.CanGoBack;
             //assert
             Assert.Multiple(() =>
             {
                 Assert.That(previousRoute, Is.Not.Null);
                 Assert.That(previousRoute?.Route.PageName, Is.EqualTo("Sample1"));
+                Assert.That(canGoBack, Is.False);
             });
         }
 
