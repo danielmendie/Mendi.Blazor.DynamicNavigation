@@ -9,14 +9,14 @@
     //     The current appId to switched to, defaults to 0. This is used for switching
     //     between multiple apps in the same project.
     //
-    //   Name:
+    //   PageName:
     //     Page name to display on sites.
+    //
+    //   ComponentType:
+    //     The component type using typeof()
     //
     //   Component:
     //     Name of the Component page to route to.
-    //
-    //   Path:
-    //     Component page full path.
     //
     //   IsDefault:
     //     Makes the page a default page for the specified AppId.

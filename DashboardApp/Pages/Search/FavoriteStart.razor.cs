@@ -8,6 +8,13 @@ namespace CountryApp.Pages.Search
     [NavigatorRoutableComponent("Your Favorites", false)]
     public partial class FavoriteStart
     {
+        List<LocationSearchItem> Bookmarks = [];
+
+        protected override void OnInitialized()
+        {
+            Bookmarks = UserFavorites;
+        }
+
         async Task ShowFavorite(LocationSearchItem searchItem)
         {
             var parameter = new Dictionary<string, string>()
@@ -19,8 +26,8 @@ namespace CountryApp.Pages.Search
 
         async Task Delete(LocationSearchItem searchItem)
         {
-            UserFavorites.Remove(searchItem);
-            await LocalStorage.SetItemAsync(ConfigType.UserFavoritesStore, UserFavorites);
+            Bookmarks.Remove(searchItem);
+            await LocalStorage.SetItemAsync(ConfigType.UserFavoritesStore, Bookmarks);
             StateHasChanged();
         }
     }

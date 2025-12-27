@@ -23,9 +23,9 @@ namespace CountryApp.Pages
 
             var countries = await DocumentDataService
                 .GetConfiguration<List<CountryData>>(ConfigType.CountryData);
-            DataModule._countries.AddRange(countries);
+            DataModule._countries.AddRange(countries!);
 
-            var list = new List<LocationSearchItem>(countries.Count * 4);
+            var list = new List<LocationSearchItem>(countries!.Count * 4);
 
             int total = countries.Count;
             int processed = 0;
@@ -67,7 +67,7 @@ namespace CountryApp.Pages
 
                 processed++;
 
-                _loadProgress += (int)((processed / (double)total) * 30);
+                _loadProgress += (int)((processed / (double)total) * 100);
                 if (processed % 10 == 0)
                 {
                     await InvokeAsync(StateHasChanged);

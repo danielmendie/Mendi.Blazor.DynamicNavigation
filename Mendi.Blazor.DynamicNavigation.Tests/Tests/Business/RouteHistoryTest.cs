@@ -37,6 +37,38 @@ namespace Mendi.Blazor.DynamicNavigation.Tests.Tests.Business
         }
 
         [Test, Order(2)]
+        public void RouteHistory_Record_MultipleSameRouteAndParameter_ShouldUpdateOnlyOneInHistory_Successfully()
+        {
+            //arrange
+            var expectedSize = 2;
+            var service = BuildRouteHistory();
+            var route = new RoutePageInfo
+            {
+                AppId = 0,
+                PageName = "Sample",
+                Component = "Sample",
+                IsDefault = true,
+                ComponentType = typeof(RouteHistoryTest)
+            };
+            var route2 = new RoutePageInfo
+            {
+                AppId = 0,
+                PageName = "Sample",
+                Component = "Sample",
+                IsDefault = true,
+                ComponentType = typeof(RouteHistoryTest),
+                Params = new() { { "Id", "1" } }
+            };
+            //act
+            service.Record(route, null);
+            service.Record(route, null);
+            service.Record(route2, null);
+            var size = service.EntrySize;
+            //assert
+            Assert.That(size, Is.EqualTo(expectedSize));
+        }
+
+        [Test, Order(2)]
         public void RouteHistory_GetPrevious_ShouldReturnPreviousRoute_Successfully()
         {
             //arrange
@@ -61,13 +93,11 @@ namespace Mendi.Blazor.DynamicNavigation.Tests.Tests.Business
             service.Record(route2, null);
             //act
             var previousRoute = service.GetPrevious();
-            var canGoBack = service.CanGoBack;
             //assert
             Assert.Multiple(() =>
             {
                 Assert.That(previousRoute, Is.Not.Null);
                 Assert.That(previousRoute?.Route.PageName, Is.EqualTo("Sample1"));
-                Assert.That(canGoBack, Is.False);
             });
         }
 

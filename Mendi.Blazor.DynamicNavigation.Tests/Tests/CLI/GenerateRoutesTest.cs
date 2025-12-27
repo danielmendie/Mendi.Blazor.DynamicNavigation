@@ -5,8 +5,8 @@ namespace Mendi.Blazor.DynamicNavigation.Tests.Tests.CLI
     [TestFixture]
     public class GenerateRoutesTest
     {
-
         [Test]
+        [Ignore("Only to be run on actual dev env")]
         public void GenerateRoutesCommand_WithValidFile_ShouldNotUpdateFileOnDryRun_Successfully()
         {
             var option = new CommandOptions
@@ -27,6 +27,7 @@ namespace Mendi.Blazor.DynamicNavigation.Tests.Tests.CLI
         }
 
         [Test]
+        [Ignore("Only to be run on actual dev env")]
         public void GenerateRoutesCommand_WithValidFile_ShouldProcess_Successfully()
         {
             var option = new CommandOptions

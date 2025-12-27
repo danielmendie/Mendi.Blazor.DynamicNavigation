@@ -31,6 +31,7 @@ namespace Mendi.Blazor.DynamicNavigation.Tests
         {
             IServiceCollection serviceCollection = new ServiceCollection();
             serviceCollection.AddBlazorDynamicNavigator(options => options.IgnoreRouteHistory = false);
+            serviceCollection.AddScoped(typeof(ILocalStorageProvider), typeof(MockKeyValueStore));
             serviceCollection.AddScoped(typeof(ILogger<>), typeof(MockLogger<>));
             serviceCollection.AddSingleton(typeof(IJSRuntime), typeof(MockJsRuntime));
 

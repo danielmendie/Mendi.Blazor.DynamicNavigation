@@ -4,7 +4,8 @@
     {
         public const string BaseNavigatorComponentName = "BaseNavigator.cs";
         public const string HomeIndexComponentName = "Home.razor";
-
         public const string AttributeNavigatorBaseComponent = "NavigatorBaseComponent";
+        public const string AttributeNavigatorRoutableComponent = "NavigatorRoutableComponent";
+        public const string AttributeNavigatorIndexComponent = "NavigatorIndexComponent";
     }
 }

@@ -23,9 +23,6 @@ namespace Mendi.Blazor.DynamicNavigation.Tests.Mocks
 
         private TValue HandleInvoke<TValue>(string identifier, object?[]? args)
         {
-            // Adjust identifiers to match what Blazored.LocalStorage uses.
-            // This is illustrative – you need to line up with the actual JS names.
-
             switch (identifier)
             {
                 case "localStorage.setItem":
@@ -42,7 +39,6 @@ namespace Mendi.Blazor.DynamicNavigation.Tests.Mocks
                     return default!;
 
                 default:
-                    // For everything else, just return default
                     return default!;
             }
         }

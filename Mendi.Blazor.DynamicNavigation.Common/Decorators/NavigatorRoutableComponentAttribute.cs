@@ -4,7 +4,7 @@ namespace Mendi.Blazor.DynamicNavigation
 {
     //
     // Summary:
-    //     Denotes the target component as a routeable component.
+    //     Denotes the target component as a routable component.
     [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
     [Obfuscation(Exclude = true)]
     public class NavigatorRoutableComponentAttribute : Attribute

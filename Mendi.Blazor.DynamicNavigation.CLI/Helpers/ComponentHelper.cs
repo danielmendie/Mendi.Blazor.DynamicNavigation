@@ -11,22 +11,15 @@ namespace Mendi.Blazor.DynamicNavigation.CLI.Helpers
     {
         public static (string ProjectName, string TargetFramework, string DllPath)? GetProjectAssemblyInfo(string directory)
         {
-            // 1. Find the first .csproj in the directory (or subdirectories)
             var csprojPath = Directory.EnumerateFiles(directory, "*.csproj", SearchOption.TopDirectoryOnly).FirstOrDefault();
-
             if (csprojPath is null)
             {
                 return null;
             }
 
-            // Load minimal XML – SDK-style project assumed
             var doc = XDocument.Load(csprojPath);
             var ns = doc.Root?.Name.Namespace ?? XNamespace.None;
-
-            // 1a. Get project name from file name (simple and usually correct)
             var projectName = Path.GetFileNameWithoutExtension(csprojPath);
-
-            // 1b. Read TargetFramework or TargetFrameworks
             var propertyGroup = doc.Descendants(ns + "PropertyGroup").FirstOrDefault();
             if (propertyGroup is null)
             {
@@ -43,7 +36,6 @@ namespace Mendi.Blazor.DynamicNavigation.CLI.Helpers
             }
             else if (tfmsElement != null && !string.IsNullOrWhiteSpace(tfmsElement.Value))
             {
-                // If multiple TFMs, pick the first one for now (you can adjust this policy later)
                 targetFramework = tfmsElement.Value.Split(';', StringSplitOptions.RemoveEmptyEntries)[0].Trim();
             }
             else
@@ -51,8 +43,6 @@ namespace Mendi.Blazor.DynamicNavigation.CLI.Helpers
                 return null;
             }
 
-            // 2. Build the expected DLL path: <projectFolder>\bin\<Configuration>\<TFM>\<ProjectName>.dll
-            // Assume Debug if not specified; you can make Configuration an argument if needed.
             var projectDir = Path.GetDirectoryName(csprojPath)!;
             var configuration = "Debug";
 
@@ -60,7 +50,6 @@ namespace Mendi.Blazor.DynamicNavigation.CLI.Helpers
 
             if (!File.Exists(dllPath))
             {
-                // If not built yet, return null or throw, depending on your CLI’s behaviour
                 return null;
             }
 
@@ -69,7 +58,7 @@ namespace Mendi.Blazor.DynamicNavigation.CLI.Helpers
 
         public static IEnumerable<string> GetRoutableComponents(string directory)
         {
-            string attributeName = "NavigatorRoutableComponent";
+            string attributeName = ConstantHelper.AttributeNavigatorRoutableComponent;
             var csFiles = Directory.EnumerateFiles(directory, "*.razor.cs", SearchOption.AllDirectories);
 
             foreach (var filePath in csFiles)
@@ -99,7 +88,7 @@ namespace Mendi.Blazor.DynamicNavigation.CLI.Helpers
 
         public static string GetIndexComponentByAttribute(string directory)
         {
-            string attributeName = "NavigatorIndexComponent";
+            string attributeName = ConstantHelper.AttributeNavigatorIndexComponent;
             var csFiles = Directory.EnumerateFiles(directory, "*.razor.cs", SearchOption.AllDirectories);
 
             foreach (var filePath in csFiles)
@@ -146,7 +135,7 @@ namespace Mendi.Blazor.DynamicNavigation.CLI.Helpers
             {
                 if (skip)
                 {
-                    UtilsHelper.Log($"Dry Run - Skipping BaseNavigator file creation.");
+                    UtilityHelper.Log($"Dry Run - Skipping BaseNavigator file creation.");
                     return string.Empty;
                 }
 
@@ -163,7 +152,7 @@ namespace Mendi.Blazor.DynamicNavigation.CLI.Helpers
                 ";
 
                 File.WriteAllText(baseNavigatorPath, fileContents);
-                UtilsHelper.FormatCode(baseNavigatorPath, []);
+                UtilityHelper.FormatCode(baseNavigatorPath, []);
                 EnsureImportsInheritsBaseNavigator(directory);
                 return baseNavigatorPath;
             }
@@ -173,25 +162,20 @@ namespace Mendi.Blazor.DynamicNavigation.CLI.Helpers
 
         private static void EnsureImportsInheritsBaseNavigator(string directory)
         {
-            var importsPath = Directory.EnumerateFiles(directory, "_Imports.razor", SearchOption.AllDirectories)
-                                       .FirstOrDefault();
-
+            var importsPath = Directory.EnumerateFiles(directory, "_Imports.razor", SearchOption.AllDirectories).FirstOrDefault();
             if (importsPath is null)
             {
-                return; // nothing to do if there's no _Imports.razor
+                return;
             }
 
             var lines = File.ReadAllLines(importsPath).ToList();
             const string inheritsLine = "@inherits BaseNavigator";
-
-            // Case-insensitive check to avoid duplicates with different spacing/casing
             var exists = lines.Any(l => string.Equals(l.Trim(), inheritsLine, StringComparison.OrdinalIgnoreCase));
             if (exists)
             {
                 return;
             }
 
-            // Append as a new line at the bottom
             lines.Add(inheritsLine);
             File.WriteAllLines(importsPath, lines);
         }
@@ -199,14 +183,11 @@ namespace Mendi.Blazor.DynamicNavigation.CLI.Helpers
         static bool HasAttribute(string filePath, string attributeName)
         {
             string code = File.ReadAllText(filePath);
-
             SyntaxTree syntaxTree = CSharpSyntaxTree.ParseText(code);
             var root = syntaxTree.GetRoot();
-
             var attributeNodes = root.DescendantNodes()
                 .OfType<AttributeSyntax>()
                 .Where(attr => attr.Name.ToString() == attributeName);
-
             return attributeNodes.Any();
         }
 
@@ -214,22 +195,13 @@ namespace Mendi.Blazor.DynamicNavigation.CLI.Helpers
         {
             try
             {
-                // Parse the syntax tree from the file content
                 var syntaxTree = CSharpSyntaxTree.ParseText(fileContent);
                 var root = await syntaxTree.GetRootAsync();
-
-                // Find the first class declaration
                 var classDeclaration = root.DescendantNodes().OfType<ClassDeclarationSyntax>().FirstOrDefault();
-
                 if (classDeclaration != null)
                 {
-                    // Get the class name
                     var className = classDeclaration.Identifier.Text;
-
-                    // Get the namespace name (optional)
                     var namespaceName = (classDeclaration.Parent as NamespaceDeclarationSyntax)?.Name?.ToString();
-
-                    // Build the fully qualified name
                     var fullyQualifiedName = string.IsNullOrEmpty(namespaceName) ? className : $"{namespaceName}.{className}";
 
                     var projectInfo = GetProjectAssemblyInfo(path);
@@ -239,10 +211,7 @@ namespace Mendi.Blazor.DynamicNavigation.CLI.Helpers
                     }
                     else
                     {
-                        // Load the target assembly dynamically
                         var targetAssembly = Assembly.LoadFrom(projectInfo.Value.DllPath);
-
-                        // Try to find the type in the target assembly
                         var targetType = targetAssembly?.GetType(fullyQualifiedName);
 
                         if (targetType != null)
@@ -268,28 +237,20 @@ namespace Mendi.Blazor.DynamicNavigation.CLI.Helpers
         {
             try
             {
-                // Parse the syntax tree from the file content
                 var syntaxTree = CSharpSyntaxTree.ParseText(fileContent);
                 var root = await syntaxTree.GetRootAsync();
-
-                // Find the first class declaration
                 var classDeclaration = root.DescendantNodes().OfType<ClassDeclarationSyntax>().FirstOrDefault();
 
                 if (classDeclaration != null)
                 {
-                    // Get the class name
                     var className = classDeclaration.Identifier.Text;
                     if (!withNameSpace)
                     {
                         return className;
                     }
 
-                    // Get the namespace name (optional)
                     var namespaceName = (classDeclaration.Parent as NamespaceDeclarationSyntax)?.Name?.ToString();
-
-                    // Build the fully qualified name
                     var fullyQualifiedName = string.IsNullOrEmpty(namespaceName) ? className : $"{namespaceName}.{className}";
-
                     return className;
                 }
             }

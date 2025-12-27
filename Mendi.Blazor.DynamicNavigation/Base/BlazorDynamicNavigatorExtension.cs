@@ -1,5 +1,4 @@
-﻿using Blazored.LocalStorage;
-using Mendi.Blazor.DynamicNavigation.Business;
+﻿using Mendi.Blazor.DynamicNavigation.Business;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Mendi.Blazor.DynamicNavigation
@@ -21,12 +20,12 @@ namespace Mendi.Blazor.DynamicNavigation
             ArgumentNullException.ThrowIfNull(configuration, nameof(configuration));
             NavigatorSettings options = new NavigatorSettings();
             configuration(options);
-            services.AddBlazoredLocalStorage();
             services.AddSingleton(options);
             services.AddSingleton<NavigatorRegistry>();
             services.AddScoped<IRouteStorage, RouteStorage>();
             services.AddScoped<IRouteHistory, RouteHistory>();
             services.AddScoped<NavigationState>();
+            services.AddScoped<ILocalStorageProvider, LocalStorageProvider>();
             services.AddScoped<IRoutesProvider, RouteProvider>();
             services.AddScoped<IRouteResolver, RouteResolver>();
             return services;

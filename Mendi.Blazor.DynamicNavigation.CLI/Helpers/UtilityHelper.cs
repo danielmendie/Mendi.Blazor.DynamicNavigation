@@ -6,7 +6,7 @@ using System.Diagnostics;
 
 namespace Mendi.Blazor.DynamicNavigation.CLI.Helpers
 {
-    public class UtilsHelper
+    public class UtilityHelper
     {
         public static int FindMatchingClosingBrace(string[] lines, int startIndex)
         {
@@ -82,7 +82,7 @@ namespace Mendi.Blazor.DynamicNavigation.CLI.Helpers
                     namespaces.AddRange(projectNameSpaces.Distinct());
 
                 // Add missing using statements
-                var usings = UtilsHelper.AddMissingUsings(root, namespaces);
+                var usings = UtilityHelper.AddMissingUsings(root, namespaces);
 
                 // Format the syntax tree using Roslyn's Formatter
                 SyntaxNode formattedRoot = Formatter.Format(usings, new AdhocWorkspace());

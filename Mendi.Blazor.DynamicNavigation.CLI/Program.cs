@@ -21,7 +21,7 @@ public class Program
         }
         catch (Exception ex)
         {
-            UtilsHelper.Log($"Error occurred while running engine tool: {ex.Message}");
+            UtilityHelper.Log($"Error occurred while running engine tool: {ex.Message}");
         }
     }
 
@@ -35,23 +35,23 @@ public class Program
             }
             else
             {
-                UtilsHelper.Log($"Invalid command action: {options.Subcommand}");
+                UtilityHelper.Log($"Invalid command action: {options.Subcommand}");
             }
         }
         else if (options.Command == "version")
         {
             var version = Assembly.GetExecutingAssembly().GetName().Version;
-            UtilsHelper.Log($"version: {version}");
+            UtilityHelper.Log($"version: {version}");
         }
         else
         {
-            UtilsHelper.Log($"Invalid engine command: {options.Command}");
+            UtilityHelper.Log($"Invalid engine command: {options.Command}");
         }
     }
 
     static void HandleParsingErrors(IEnumerable<Error> errors)
     {
         // Handle parsing errors (display help, show error messages, etc.)
-        UtilsHelper.Log("Error parsing command-line arguments.");
+        UtilityHelper.Log("Error parsing command-line arguments.");
     }
 }

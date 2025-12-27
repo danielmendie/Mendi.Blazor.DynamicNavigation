@@ -9,41 +9,41 @@ namespace Mendi.Blazor.DynamicNavigation.CLI.Commands
     {
         public static async Task<int> RunAsync(CommandOptions options)
         {
-            UtilsHelper.Log("---------- Navigation Engine Started ----------");
+            UtilityHelper.Log("---------- Navigation Engine Started ----------");
 
             if (string.IsNullOrWhiteSpace(options.Path))
                 options.Path = Directory.GetCurrentDirectory();
 
-            UtilsHelper.Log($"Project directory: {options.Path}", options.Verbose);
+            UtilityHelper.Log($"Project directory: {options.Path}", options.Verbose);
             var projectInfo = ComponentHelper.GetProjectAssemblyInfo(options.Path);
 
             if (options.Force || projectInfo == null)
             {
-                UtilsHelper.Log("Build started...", options.Verbose);
-                var ok = UtilsHelper.BuildProject(options.Path, configuration: "Debug");
+                UtilityHelper.Log("Build started...", options.Verbose);
+                var ok = UtilityHelper.BuildProject(options.Path, configuration: "Debug");
                 if (!ok)
                 {
-                    UtilsHelper.Log("dotnet build failed. Aborting route generation.");
+                    UtilityHelper.Log("dotnet build failed. Aborting route generation.");
                     return 1;
                 }
-                UtilsHelper.Log("Build completed", options.Verbose);
+                UtilityHelper.Log("Build completed", options.Verbose);
             }
 
-            UtilsHelper.Log($"Searching for routable components...", options.Verbose);
+            UtilityHelper.Log($"Searching for routable components...", options.Verbose);
             var routes = ComponentHelper.GetRoutableComponents(options.Path);
 
             if (!routes.Any())
             {
-                UtilsHelper.Log("No routable components found");
+                UtilityHelper.Log("No routable components found");
             }
             else
             {
-                UtilsHelper.Log($"Found {routes.Count()} components");
-                UtilsHelper.Log($"Searching for base components...", options.Verbose);
+                UtilityHelper.Log($"Found {routes.Count()} components");
+                UtilityHelper.Log($"Searching for base components...", options.Verbose);
                 await GeneratePageRoutes(routes, options);
             }
 
-            UtilsHelper.Log("---------- Navigation Engine Completed ----------");
+            UtilityHelper.Log("---------- Navigation Engine Completed ----------");
             return 0;
         }
 
@@ -55,7 +55,7 @@ namespace Mendi.Blazor.DynamicNavigation.CLI.Commands
                 var basePath = ComponentHelper.GetBaseComponentByAttribute(option);
                 if (option.DryRun)
                 {
-                    UtilsHelper.Log($"Dry Run - skipping {routeFilePaths.Count()} route file updates.");
+                    UtilityHelper.Log($"Dry Run - skipping {routeFilePaths.Count()} route file updates.");
                     return;
                 }
 
@@ -65,13 +65,13 @@ namespace Mendi.Blazor.DynamicNavigation.CLI.Commands
                 foreach (var componentPath in routeFilePaths)
                 {
                     //read file content
-                    UtilsHelper.Log($"Processing route for: {componentPath}", option.Verbose);
+                    UtilityHelper.Log($"Processing route for: {componentPath}", option.Verbose);
                     var fileContent = File.ReadAllText(componentPath);
 
                     var (componentType, nameSpace) = await ComponentHelper.ExtractComponentTypeAsync(fileContent, option.Path);
                     if (componentType == null)
                     {
-                        UtilsHelper.Log($"Failed to extract at path: {componentPath}", option.Verbose);
+                        UtilityHelper.Log($"Failed to extract at path: {componentPath}", option.Verbose);
                         continue;
                     }
 
@@ -166,7 +166,7 @@ namespace Mendi.Blazor.DynamicNavigation.CLI.Commands
             }
             catch (Exception ex)
             {
-                UtilsHelper.Log($"******* {ex.Message} ");
+                UtilityHelper.Log($"******* {ex.Message} ");
             }
         }
 
@@ -178,7 +178,7 @@ namespace Mendi.Blazor.DynamicNavigation.CLI.Commands
 
             if (!File.Exists(filePath))
             {
-                UtilsHelper.Log($"File not found: {filePath}");
+                UtilityHelper.Log($"File not found: {filePath}");
                 return;
             }
 
@@ -198,7 +198,7 @@ namespace Mendi.Blazor.DynamicNavigation.CLI.Commands
 
             if (startIndex != -1)
             {
-                int endIndex = UtilsHelper.FindMatchingClosingBrace(lines, startIndex);
+                int endIndex = UtilityHelper.FindMatchingClosingBrace(lines, startIndex);
 
                 if (endIndex != -1)
                 {
@@ -242,7 +242,7 @@ namespace Mendi.Blazor.DynamicNavigation.CLI.Commands
             }
 
             File.WriteAllLines(filePath, lines);
-            UtilsHelper.FormatCode(filePath, ProjectNameSpaces);
+            UtilityHelper.FormatCode(filePath, ProjectNameSpaces);
         }
 
 
@@ -269,7 +269,7 @@ namespace Mendi.Blazor.DynamicNavigation.CLI.Commands
                 if (startIndex != -1) proceed = false;
                 if (startIndex != -1)
                 {
-                    int endIndex = UtilsHelper.FindMatchingClosingBrace(lines, startIndex);
+                    int endIndex = UtilityHelper.FindMatchingClosingBrace(lines, startIndex);
 
                     if (endIndex != -1)
                     {
@@ -295,12 +295,12 @@ namespace Mendi.Blazor.DynamicNavigation.CLI.Commands
 
                     File.WriteAllLines(filePath, lines);
 
-                    UtilsHelper.FormatCode(filePath, ProjectNameSpaces, true);
+                    UtilityHelper.FormatCode(filePath, ProjectNameSpaces, true);
                 }
             }
             else
             {
-                UtilsHelper.Log($"File not found: {filePath}");
+                UtilityHelper.Log($"File not found: {filePath}");
             }
         }
 

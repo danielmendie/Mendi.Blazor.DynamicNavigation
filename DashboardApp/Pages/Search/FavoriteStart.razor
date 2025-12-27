@@ -4,7 +4,7 @@
     <h1>Bookmarked Searched</h1>
     <p class="text-muted mb-5">Your list of favorite countries you have a tab on</p>
 
-    @if (UserFavorites.Count == 0)
+    @if (Bookmarks.Count == 0)
     {
         <NoDataDisplay Header="No Favorite"
                        Icon="@Icons.Material.TwoTone.Pin"
@@ -16,7 +16,7 @@
             <div class="card-header"><h5>Recent Search</h5></div>
             <div class="card-body">
                 <div class="row">
-                    @foreach (var item in UserFavorites)
+                    @foreach (var item in Bookmarks)
                     {
                         <div class="col-sm-6 col-xs-12">
                             <ul class="list-group list-group-flush">
@@ -27,7 +27,7 @@
                                             <p class="text-primary mb-0">@item.DisplayName</p>
                                         </div>
                                         <div class="form-check form-switch p-0">
-                                            <MudIcon Color="Color.Error" Icon="@Icons.Material.TwoTone.Delete" @onclick="()=>Delete(item)" />
+                                            <MudIcon Color="Color.Error" Icon="@Icons.Material.TwoTone.Delete" @onclick="()=>Delete(item)" Style="cursor:pointer" />
                                         </div>
                                     </div>
                                 </li>

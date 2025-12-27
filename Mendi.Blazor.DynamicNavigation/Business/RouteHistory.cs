@@ -13,6 +13,7 @@
         /// Gets a value indicating whether the user can navigate back in the history.
         /// </summary>
         public bool CanGoBack => _history.Count > 1;
+        public int EntrySize => _history.Count;
         /// <summary>
         /// Records the specified route and its associated parameters into the navigation history.
         /// </summary>
@@ -26,6 +27,13 @@
             if (route is null)
             {
                 throw new ArgumentNullException(nameof(route));
+            }
+            if (_history.Count > 0)
+            {
+                var (lastRoute, lastParams) = _history[^1];
+
+                if (lastRoute.Equals(route) && AreParamsEqual(lastParams, parameters))
+                    return;
             }
             _history.Add((route, parameters));
         }
@@ -54,5 +62,24 @@
         /// <remarks>After calling this method, the history will be empty. This operation does not throw
         /// exceptions.</remarks>
         public void Clear() => _history.Clear();
+        /// <summary>
+        /// Compares two dictionaries of parameters for equality.
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
+        private static bool AreParamsEqual(Dictionary<string, string>? a, Dictionary<string, string>? b)
+        {
+            if (ReferenceEquals(a, b)) return true;
+            if (a is null || b is null) return false;
+            if (a.Count != b.Count) return false;
+
+            foreach (var kv in a)
+            {
+                if (!b.TryGetValue(kv.Key, out var value) || value != kv.Value)
+                    return false;
+            }
+            return true;
+        }
     }
 }
