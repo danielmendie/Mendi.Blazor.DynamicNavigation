@@ -1,8 +1,8 @@
-﻿using DashboardApp.Abstractions.Models;
+﻿using CountryApp.Abstractions.Models;
 using Mendi.Blazor.DynamicNavigation;
 using System.ComponentModel.DataAnnotations;
 
-namespace DashboardApp.Pages.Profile.Pages
+namespace CountryApp.Pages.Profile.Pages
 {
     [NavigatorRoutableComponent("Profile Update", false)]
     public partial class AccountProfile
@@ -24,7 +24,7 @@ namespace DashboardApp.Pages.Profile.Pages
             IsLoading = true;
 
             await UpdateUserData(nameof(AuthUserData.Email), EditContext.Email);
-            await UpdateUserData(nameof(AuthUserData.Name), EditContext.Name);
+            await UpdateUserData(nameof(AuthUserData.Name), EditContext.Name!);
 
             ShowNotification("Profile updated successfully", MudBlazor.Severity.Success);
             IsLoading = false;
@@ -33,7 +33,7 @@ namespace DashboardApp.Pages.Profile.Pages
         class ProfileModel
         {
             [Required(ErrorMessage = "Your full name is required")]
-            public string Name { get; set; } = null!;
+            public string? Name { get; set; }
             [Required(ErrorMessage = "Your email is required")]
             public string Email { get; set; } = null!;
         }

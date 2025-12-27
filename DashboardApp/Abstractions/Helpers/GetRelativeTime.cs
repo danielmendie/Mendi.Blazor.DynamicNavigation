@@ -1,6 +1,7 @@
 ﻿using System.Globalization;
+using System.Text.RegularExpressions;
 
-namespace DashboardApp.Abstractions.Helpers
+namespace CountryApp.Abstractions.Helpers
 {
     public class DateHelper
     {
@@ -131,86 +132,24 @@ namespace DashboardApp.Abstractions.Helpers
             }
         }
 
-        public static bool IsSameBiWeekly(DateTime date1, List<DateTime>? date2)
+        public static string FormatToHumanReadable(string input)
         {
-            if (date2 == null || date2.Count == 0)
-                return false;
+            if (string.IsNullOrWhiteSpace(input))
+                return string.Empty;
 
-            // Choose a fixed reference start date for your pay/bi-weekly cycle
-            DateTime reference = new DateTime(DateTime.Today.Year, 1, 1);
+            // Replace underscores or hyphens with spaces
+            string result = input.Replace("_", " ").Replace("-", " ");
 
-            bool isSamePeriod = false;
-            foreach (var item in date2)
-            {
-                // Calculate how many days each date is from the reference date
-                int days1 = (int)(date1.Date - reference.Date).TotalDays;
-                int days2 = (int)(item.Date - reference.Date).TotalDays;
+            // Insert spaces before capital letters (for PascalCase or camelCase)
+            result = Regex.Replace(result, @"(?<=[a-z])([A-Z])", " $1");
 
-                // Divide by 14 to get the bi-weekly period index
-                int period1 = days1 / 14;
-                int period2 = days2 / 14;
+            // Normalize spaces
+            result = Regex.Replace(result, @"\s+", " ").Trim();
 
-                isSamePeriod = period1 == period2;
-                if (isSamePeriod)
-                    break;
-            }
+            // Capitalize first letter of each word
+            result = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(result.ToLower());
 
-            return isSamePeriod;
+            return result;
         }
-
-        public static bool IsSameWeek(DateTime date1, List<DateTime>? date2)
-        {
-            if (date2 == null || date2.Count == 0)
-                return false;
-
-            CultureInfo cultureInfo = CultureInfo.CurrentCulture;
-            Calendar calendar = cultureInfo.Calendar;
-
-            CalendarWeekRule weekRule = cultureInfo.DateTimeFormat.CalendarWeekRule;
-            DayOfWeek firstDayOfWeek = cultureInfo.DateTimeFormat.FirstDayOfWeek;
-
-            bool isSamePeriod = false;
-            foreach (var item in date2)
-            {
-                int week1 = calendar.GetWeekOfYear(date1, weekRule, firstDayOfWeek);
-                int week2 = calendar.GetWeekOfYear(item, weekRule, firstDayOfWeek);
-
-                isSamePeriod = week1 == week2 && date1.Year == item.Year;
-                if (isSamePeriod)
-                    break;
-            }
-            return isSamePeriod;
-        }
-
-        public static bool IsSameMonth(DateTime date1, List<DateTime>? date2)
-        {
-            if (date2 == null || date2.Count == 0)
-                return false;
-
-            bool isSamePeriod = false;
-            foreach (var item in date2)
-            {
-                isSamePeriod = date1.Year == item.Year && date1.Month == item.Month;
-                if (isSamePeriod)
-                    break;
-            }
-            return isSamePeriod;
-        }
-
-        public static bool IsSameDay(DateTime date1, List<DateTime>? date2)
-        {
-            if (date2 == null || date2.Count == 0)
-                return false;
-
-            bool isSamePeriod = false;
-            foreach (var item in date2)
-            {
-                isSamePeriod = date1.Date == item.Date;
-                if (isSamePeriod)
-                    break;
-            }
-            return isSamePeriod;
-        }
-
     }
 }

@@ -1,12 +1,12 @@
 ﻿using Blazored.LocalStorage;
-using DashboardApp.Abstractions.Constants;
-using DashboardApp.Abstractions.Models;
+using CountryApp.Abstractions.Constants;
+using CountryApp.Abstractions.Models;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
-namespace DashboardApp.Abstractions.Services.Providers
+namespace CountryApp.Abstractions.Services.Providers
 {
     public class AuthStateProvider : AuthenticationStateProvider, IAccessTokenProvider
     {

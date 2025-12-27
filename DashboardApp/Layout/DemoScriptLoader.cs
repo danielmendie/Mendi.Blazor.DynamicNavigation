@@ -1,9 +1,9 @@
-using DashboardApp.Abstractions.Services.Providers;
+using CountryApp.Abstractions.Services.Providers;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Rendering;
 using Microsoft.JSInterop;
 
-namespace DashboardApp.Layout
+namespace CountryApp.Layout
 {
     public class DemoScriptLoader : ComponentBase, IDisposable
     {

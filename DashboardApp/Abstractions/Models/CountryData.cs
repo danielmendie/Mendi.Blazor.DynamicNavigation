@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace DashboardApp.Abstractions.Models
+namespace CountryApp.Abstractions.Models
 {
     public class CityDTO
     {

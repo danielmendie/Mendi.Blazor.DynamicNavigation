@@ -1,15 +1,15 @@
-﻿using DashboardApp.Abstractions.Models;
-using DashboardApp.Abstractions.Services.Data;
+﻿using CountryApp.Abstractions.Models;
+using CountryApp.Abstractions.Services.Data;
 using System.Reflection;
 
-namespace DashboardApp.Business
+namespace CountryApp.Business
 {
     public class DocumentDataService : IDocumentDataService
     {
         public async Task<T?> GetConfiguration<T>(string settingType)
         {
             await Task.Delay(1);
-            var resourceName = $"DashboardApp.Abstractions.Data.{settingType}.latest.json";
+            var resourceName = $"CountryApp.Abstractions.Data.{settingType}.latest.json";
             var data = GetMetadataJson(resourceName);
             var retVal = Newtonsoft.Json.JsonConvert.DeserializeObject<T>(data);
 
@@ -24,7 +24,7 @@ namespace DashboardApp.Business
         public async Task<string> GetDocumentType(string documentType)
         {
             await Task.Delay(1);
-            var resourceName = $"DashboardApp.Abstractions.Data.{documentType}";
+            var resourceName = $"CountryApp.Abstractions.Data.{documentType}";
             var retVal = GetMetadataJson(resourceName);
 
             return retVal;

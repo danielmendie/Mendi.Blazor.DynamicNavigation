@@ -1,4 +1,4 @@
-﻿namespace DashboardApp.Abstractions.Services.Data
+﻿namespace CountryApp.Abstractions.Services.Data
 {
     public interface IDocumentDataService
     {

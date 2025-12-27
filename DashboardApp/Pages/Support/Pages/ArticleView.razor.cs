@@ -1,9 +1,9 @@
-﻿using DashboardApp.Abstractions.Constants;
-using DashboardApp.Abstractions.Models;
+﻿using CountryApp.Abstractions.Constants;
+using CountryApp.Abstractions.Models;
 using Mendi.Blazor.DynamicNavigation;
 using Microsoft.AspNetCore.Components;
 
-namespace DashboardApp.Pages.Support.Pages
+namespace CountryApp.Pages.Support.Pages
 {
     [NavigatorRoutableComponent("Help Article", false)]
     public partial class ArticleView
@@ -16,7 +16,7 @@ namespace DashboardApp.Pages.Support.Pages
         protected override async Task OnInitializedAsync()
         {
             var articles = await DocumentDataService.GetConfiguration<List<Article>>(ConfigType.HelpArticles);
-            Articles = [.. articles.Where(p => p.ParentId == Convert.ToInt32(ParentId))];
+            Articles = [.. articles!.Where(p => p.ParentId == Convert.ToInt32(ParentId))];
             Header = Articles.First().Category;
         }
 

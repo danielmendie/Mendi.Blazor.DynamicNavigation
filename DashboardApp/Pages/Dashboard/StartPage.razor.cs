@@ -1,9 +1,16 @@
-﻿using Mendi.Blazor.DynamicNavigation;
+﻿using CountryApp.Abstractions.Models;
+using Mendi.Blazor.DynamicNavigation;
 
-namespace DashboardApp.Pages.Dashboard
+namespace CountryApp.Pages.Dashboard
 {
-    [NavigatorRoutableComponent("Dashboard", true)]
+    [NavigatorRoutableComponent("Overview", true)]
     public partial class StartPage
     {
+        List<Activity> CurrentUserActivities = [];
+
+        protected override void OnInitialized()
+        {
+            CurrentUserActivities = UserActivities.Where(k => k.CreatedBy == CurrentUser.Email).OrderByDescending(j => j.CreatedOn).Take(3).ToList();
+        }
     }
 }

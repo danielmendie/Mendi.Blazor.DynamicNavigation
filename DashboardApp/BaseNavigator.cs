@@ -1,70 +1,88 @@
 using Blazored.LocalStorage;
-using DashboardApp.Abstractions.Constants;
-using DashboardApp.Abstractions.Helpers;
-using DashboardApp.Abstractions.Models;
-using DashboardApp.Abstractions.Services.Data;
-using DashboardApp.Pages.About;
-using DashboardApp.Pages.Dashboard;
-using DashboardApp.Pages.Profile;
-using DashboardApp.Pages.Search;
-using DashboardApp.Pages.Support;
-using DashboardApp.Pages.Support.Pages;
+using CountryApp.Abstractions.Constants;
+using CountryApp.Abstractions.Enums;
+using CountryApp.Abstractions.Helpers;
+using CountryApp.Abstractions.Models;
+using CountryApp.Abstractions.Services.Data;
+using CountryApp.Abstractions.Services.Util;
+using CountryApp.Pages.About;
+using CountryApp.Pages.Dashboard;
+using CountryApp.Pages.Profile;
+using CountryApp.Pages.Profile.Pages;
+using CountryApp.Pages.Search;
+using CountryApp.Pages.Support;
+using CountryApp.Pages.Support.Pages;
 using Mendi.Blazor.DynamicNavigation;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using MudBlazor;
-using DashboardApp.Pages.Profile.Pages;
 
-namespace DashboardApp;
+namespace CountryApp;
 public class BaseNavigator : BlazorDynamicNavigatorBase
 {
     [Inject]
-    public NavigatorRegistry NavigatorRegistry { get; set; } = default !;
+    public NavigatorRegistry NavigatorRegistry { get; set; } = default!;
 
     [Inject]
-    public ISnackbar Snackbar { get; set; } = null !;
+    public ISnackbar SnackBar { get; set; } = null!;
 
     [Inject]
-    public ILocalStorageService LocalStorage { get; set; } = default !;
+    public ILocalStorageService LocalStorage { get; set; } = default!;
 
     [Inject]
-    public ISyncLocalStorageService SyncLocalStorage { get; set; } = default !;
+    public ISyncLocalStorageService SyncLocalStorage { get; set; } = default!;
 
     [Inject]
-    public NavigationManager NavigationManager { get; set; } = null !;
+    public NavigationManager NavigationManager { get; set; } = null!;
 
     [Inject]
-    public IJSRuntime AppJSRuntime { get; set; } = null !;
+    public IJSRuntime AppJSRuntime { get; set; } = null!;
 
     [Inject]
-    public IDocumentDataService DocumentDataService { get; set; } = null !;
+    public IDocumentDataService DocumentDataService { get; set; } = null!;
+    [Inject] public DataModule DataModule { get; set; } = null!;
 
     protected void ShowNotification(string message, Severity severity)
     {
-        Snackbar.Clear();
-        Snackbar.Add(message, severity);
+        SnackBar.Clear();
+        SnackBar.Add(message, severity);
     }
 
     public async Task SignOut()
     {
-        await LocalStorage.ClearAsync();
+        var user = CurrentUser;
+        user.IsLoggedIn = false;
+        var activities = UserActivities;
+        activities.Add(new Activity { ActivityType = EnumActivity.SignOut, CreatedOn = DateTime.UtcNow, Description = $"You signed out of your account.", CreatedBy = CurrentUser.Email });
+
+        await LocalStorage.SetItemAsync(ConfigType.UserActivitiesStore, activities);
+        await LocalStorage.SetItemAsync(ConfigType.IdentityUserStore, user);
         NavigationManager.NavigateTo("/", true);
+    }
+
+    public List<LocationSearchItem> UserFavorites
+    {
+        get => SyncLocalStorage.GetItem<List<LocationSearchItem>>(ConfigType.UserFavoritesStore) ?? new List<LocationSearchItem>();
+        set { InvokeAsync(StateHasChanged); }
+    }
+
+    public List<Activity> UserActivities
+    {
+        get => SyncLocalStorage.GetItem<List<Activity>>(ConfigType.UserActivitiesStore) ?? new List<Activity>();
+        set { InvokeAsync(StateHasChanged); }
     }
 
     public AuthUserData CurrentUser
     {
         get => SyncLocalStorage.GetItem<AuthUserData>(ConfigType.IdentityUserStore)!;
-        set
-        {
-            InvokeAsync(StateHasChanged);
-        }
+        set { InvokeAsync(StateHasChanged); }
     }
 
     public async Task UpdateUserData(string key, object value)
     {
         if (string.IsNullOrEmpty(key) || value == null)
             return;
-        var updatedUserData = ObjectPropertyHelper.UpdateProperty(CurrentUser, key, value);
+        var updatedUserData = ObjectPropertyHelper.UpdateProperty(CurrentUser ?? new(), key, value);
         await LocalStorage.SetItemAsync(ConfigType.IdentityUserStore, updatedUserData);
         CurrentUser = updatedUserData;
     }

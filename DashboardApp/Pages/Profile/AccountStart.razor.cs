@@ -1,9 +1,9 @@
-﻿using DashboardApp.Abstractions.Models;
-using DashboardApp.Layout;
+﻿using CountryApp.Abstractions.Models;
+using CountryApp.Layout;
 using Mendi.Blazor.DynamicNavigation;
 using Microsoft.AspNetCore.Components.Forms;
 
-namespace DashboardApp.Pages.Profile
+namespace CountryApp.Pages.Profile
 {
     [NavigatorRoutableComponent("Account Setting", false)]
     public partial class AccountStart

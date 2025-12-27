@@ -1,7 +1,7 @@
 ﻿using Mendi.Blazor.DynamicNavigation;
 using System.ComponentModel.DataAnnotations;
 
-namespace DashboardApp.Pages.Profile.Pages
+namespace CountryApp.Pages.Profile.Pages
 {
     [NavigatorRoutableComponent("Account Deletion", false)]
     public partial class AccountDelete

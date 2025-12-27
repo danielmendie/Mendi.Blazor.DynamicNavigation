@@ -1,16 +1,16 @@
-﻿using DashboardApp.Abstractions.Constants;
-using DashboardApp.Abstractions.Models;
+﻿using CountryApp.Abstractions.Constants;
+using CountryApp.Abstractions.Models;
 using Mendi.Blazor.DynamicNavigation;
 using Microsoft.AspNetCore.Components;
 
-namespace DashboardApp.Pages.About
+namespace CountryApp.Pages.About
 {
     [NavigatorRoutableComponent("About App", false)]
     public partial class AboutStart
     {
         MarkupString RenderTermsOfService = new();
         MarkupString RenderPrivacyPolicy = new();
-        SettingGeneral GeneralData = null!;
+        SettingGeneral? GeneralData;
         bool IsLoading;
 
         protected override async Task OnInitializedAsync()

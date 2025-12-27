@@ -11,7 +11,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mendi.Blazor.DynamicNavigat
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mendi.Blazor.DynamicNavigation.Common", "Mendi.Blazor.DynamicNavigation.Common\Mendi.Blazor.DynamicNavigation.Common.csproj", "{4E9296A3-D8D1-473B-B7C4-BF7F724A228D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DashboardApp", "DashboardApp\DashboardApp.csproj", "{336E5E74-4D83-4822-BFEA-925E93BDA294}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CountryApp", "DashboardApp\CountryApp.csproj", "{336E5E74-4D83-4822-BFEA-925E93BDA294}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

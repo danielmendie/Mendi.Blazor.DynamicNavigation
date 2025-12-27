@@ -23765,9 +23765,7 @@ pre[class*=language-]:after, pre[class*=language-]:before {
     position: relative;
     top: 74px;
     margin-left: 280px;
-    min-height: calc(100vh - 135px);
-    background: url(/assets/images/authentication/img-auth-bg.jpg);
-    background-size: cover;
+    min-height: calc(100vh - 74px);
 }
 
     .pc-container .pc-content {

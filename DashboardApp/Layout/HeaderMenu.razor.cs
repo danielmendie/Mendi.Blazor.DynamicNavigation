@@ -1,9 +1,9 @@
-﻿using DashboardApp.Abstractions.Constants;
-using DashboardApp.Abstractions.Models;
+﻿using CountryApp.Abstractions.Constants;
+using CountryApp.Abstractions.Models;
 using Mendi.Blazor.DynamicNavigation;
 using Microsoft.JSInterop;
 
-namespace DashboardApp.Layout
+namespace CountryApp.Layout
 {
     public partial class HeaderMenu
     {

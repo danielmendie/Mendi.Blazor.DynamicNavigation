@@ -1,4 +1,4 @@
-﻿namespace DashboardApp.Abstractions.Helpers
+﻿namespace CountryApp.Abstractions.Helpers
 {
     public static class ObjectPropertyHelper
     {

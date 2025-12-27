@@ -109,7 +109,10 @@ function OpenMenu() {
                     </li>
                 }
                 <li class="dropdown pc-h-item">
-                    <a @onclick:preventDefault @onclick="() => OnMenuItemClicked(nameof(FavoriteStart))" class="pc-head-link arrow-none me-0" role="button"><MudIcon Icon="@Icons.Material.TwoTone.PushPin" Size="Size.Large" /></a>
+                    <MudBadge Content="UserFavorites.Count" Color="Color.Primary" Overlap Dot Visible="(UserFavorites.Count > 0)">
+                    <a @onclick:preventDefault @onclick="() => OnMenuItemClicked(nameof(FavoriteStart))" class="pc-head-link arrow-none me-0" role="button">
+                        <MudIcon Icon="@Icons.Material.TwoTone.PushPin" Size="Size.Large" /></a>
+                    </MudBadge>
                 </li>
                 <li class="dropdown pc-h-item">
                     <a @onclick:preventDefault @onclick="() => OnMenuItemClicked(nameof(SwitchPage))" class="pc-head-link arrow-none me-0" role="button"><MudIcon Icon="@Icons.Material.TwoTone.Bolt" Size="Size.Large" Color="Color.Primary" /></a>

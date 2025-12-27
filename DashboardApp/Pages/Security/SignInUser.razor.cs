@@ -1,9 +1,10 @@
-﻿using DashboardApp.Abstractions.Constants;
-using DashboardApp.Abstractions.Models;
+﻿using CountryApp.Abstractions.Constants;
+using CountryApp.Abstractions.Enums;
+using CountryApp.Abstractions.Models;
 using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
 
-namespace DashboardApp.Pages.Security
+namespace CountryApp.Pages.Security
 {
     public partial class SignInUser
     {
@@ -12,9 +13,19 @@ namespace DashboardApp.Pages.Security
 
         async Task OnValidSubmit()
         {
+            if (CurrentUser != null && !string.IsNullOrWhiteSpace(CurrentUser.Email) && !EditContext.Email.Equals(CurrentUser.Email, StringComparison.OrdinalIgnoreCase))
+            {
+                ShowNotification("Invalid profile email", MudBlazor.Severity.Error);
+                return;
+            }
+
             IsBusy = true;
-            var modelData = new AuthUserData { IsLoggedIn = true, Email = EditContext.Email };
-            await LocalStorage.SetItemAsync(ConfigType.IdentityUserStore, modelData);
+            var activities = UserActivities;
+            activities.Add(new Activity { ActivityType = EnumActivity.SignIn, CreatedOn = DateTime.UtcNow, Description = $"You signed in using {EditContext.Email}", CreatedBy = EditContext.Email });
+            await LocalStorage.SetItemAsync(ConfigType.UserActivitiesStore, activities);
+
+            await UpdateUserData(nameof(AuthUserData.IsLoggedIn), true);
+            await UpdateUserData(nameof(AuthUserData.Email), EditContext.Email);
             NavigationManager.NavigateTo("/", true);
             IsBusy = false;
         }

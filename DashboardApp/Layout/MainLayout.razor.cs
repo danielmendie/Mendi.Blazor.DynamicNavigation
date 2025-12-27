@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 
-namespace DashboardApp.Layout
+namespace CountryApp.Layout
 {
     public partial class MainLayout
     {

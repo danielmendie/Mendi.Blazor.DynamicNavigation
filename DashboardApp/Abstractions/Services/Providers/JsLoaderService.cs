@@ -1,6 +1,6 @@
 ﻿using System.Collections.Concurrent;
 
-namespace DashboardApp.Abstractions.Services.Providers
+namespace CountryApp.Abstractions.Services.Providers
 {
     public class JsLoaderService
     {
