@@ -29,6 +29,8 @@ Open your project's **Program.cs** file and add this section
 ```csharp
 builder.Services.AddBlazorDynamicNavigator(option => option.IgnoreRouteHistory = false);
 ```
+To prevent the app from remembering last visited page, set option **IgnoreRouteHistory** to True
+
 
 **STEPS HIGHLIGHTED HERE CAN BE DONE AUTOMATICALLY USING THE CLI TOOL**
 
@@ -63,7 +65,7 @@ protected override async Task OnInitializedAsync()
 }
 ```
 
-## 🚀Using It
+## 🚀 Using It
 
 The **Mendi.Blazor.DynamicNavigation** is used for configuring your project. You'll use class and property attributes to define your routable components and parameter properties. 
 To define a routable component, decorate it with the `NavigatorRoutableComponent` attribute. Here's a typical example
@@ -74,7 +76,7 @@ using Microsoft.AspNetCore.Components;
 
 namespace TestApp.Pages
 {
-    [NavigatorRoutableComponent("Sample", true)]
+    [NavigatorRoutableComponent(pageName: "Sample", isDefault: true)]
     public partial class Sample
     {
         [Parameter] public string Username { get; set; } = null!;
@@ -104,7 +106,7 @@ Once your routable components are decorated. The rest is up to **Mendi.Blazor.Dy
 To install the latest version of **Mendi.Blazor.DynamicNavigation.CLI** tool, run `dotnet tool install -g Mendi.Blazor.DynamicNavigation.CLI` from command line
 
 
-## 🚀Using It
+## 🚀 Using It
 
 The CLI is responsible for generating route pages and binding them. To use it, open command-line tool to the directory of your project to run the following commands:
 
@@ -133,7 +135,64 @@ Once the command runs successfully, your BaseNavigator class will be populated w
 Now run the project, and don't forget to check your browser's dev tool console for extra log information if you ever get into an issue
 
 
+## 😎 Extras
+Here are a couple of extra things you can do to make this package serve your business needs adequately. The following methods can be overridden based on your needs and logic
+
+**OnAfterNavigateAsync** - Event triggered after a successful page navigation
+
+Scenario: You want to persist user page session across multiple devices, get route metadata and send to your backend api
+```csharp
+protected override Task OnAfterNavigateAsync(RoutePageInfo route, Dictionary<string, string>? parameters)
+{
+    return base.OnAfterNavigateAsync(route, parameters);
+}
+```
+
+**OnBeforeNavigateAsync** - Event triggered before a page navigation
+
+Scenario: You want to do a pre-conditional check for feature accessibility or permission
+```csharp
+protected override Task OnBeforeNavigateAsync(RoutePageInfo route, Dictionary<string, string>? parameters)
+{
+    return base.OnBeforeNavigateAsync(route, parameters);
+}
+```
+
+**OnNavigationFailedAsync** - Event triggered when page navigation fails
+```csharp
+protected override Task OnNavigationFailedAsync(Exception exception)
+{
+    return base.OnNavigationFailedAsync(exception);
+}
+```
+
+**OnCannotGoBackAsync** - Event triggered when there is no page in history to return to
+```csharp
+protected override Task OnCannotGoBackAsync()
+{
+    return base.OnCannotGoBackAsync();
+}
+```
+
+**RestoreOrNavigateToDefaultAsync** - Entry point for dynamic navigation to either restore from history or find default page based on generated pages
+
+Scenario: Fetch previous route metadata from API(multiple devices) then restore page from the fetched data
+```csharp
+protected override Task RestoreOrNavigateToDefaultAsync()
+{
+    return base.RestoreOrNavigateToDefaultAsync();
+}
+```
+
 Cheers!
+
+## Contributing
+
+Contributions are welcome! Please see [CONTRIBUTING](./CONTRIBUTING.md) for guidelines on setting up your environment, coding style, and making pull requests.
+
+## License
+
+This project is licensed under the **MIT** License. See [LICENSE](./LICENSE) for details.
 
 
 [NavigatorSampleVideo.mp4](https://github.com/danielmendie/Mendi.Blazor.DynamicNavigation/assets/66223776/0e6f1a56-d133-4604-83e7-69207cab3be2)

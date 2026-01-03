@@ -62,15 +62,16 @@ namespace Mendi.Blazor.DynamicNavigation
         /// <param name="componentName">The name of the component to navigate to. This value cannot be <see langword="null"/> or empty.</param>
         /// <param name="parameters">An optional dictionary of parameters to pass to the component. The keys represent parameter names, and the
         /// values represent their corresponding values.</param>
+        /// <param name="ignoreHistory">Ignores saving the specified route in navigation history.</param>
         /// <returns></returns>
         /// <exception cref="InvalidOperationException">Thrown if the route for the specified <paramref name="componentName"/> cannot be resolved.</exception>
-        protected async Task NavigateToAsync(string componentName, Dictionary<string, string>? parameters = null)
+        protected async Task NavigateToAsync(string componentName, Dictionary<string, string>? parameters = null, bool ignoreHistory = false)
         {
             try
             {
                 var route = await RouteResolver.GetRouteAsync(componentName)
                             ?? throw new InvalidOperationException($"Route not found for component '{componentName}'");
-                await NavigateInternalAsync(route, parameters);
+                await NavigateInternalAsync(route, parameters, ignoreHistory);
             }
             catch (Exception ex)
             {
@@ -163,21 +164,17 @@ namespace Mendi.Blazor.DynamicNavigation
         /// to storage, and notifying the UI navigator of the updated navigation state.</remarks>
         /// <param name="route">The route information representing the target page.</param>
         /// <param name="parameters">An optional dictionary of parameters to pass to the route. Can be <see langword="null"/>.</param>
+        /// <param name="ignoreHistory">An optional parameter that skips route persistency in history</param>
         /// <returns></returns>
-        private async Task NavigateInternalAsync(RoutePageInfo route, Dictionary<string, string>? parameters = null, bool ignoreHistoryOnPrevious = false)
+        private async Task NavigateInternalAsync(RoutePageInfo route, Dictionary<string, string>? parameters = null, bool ignoreHistory = false)
         {
             await OnBeforeNavigateAsync(route, parameters);
-
-            if (!ignoreHistoryOnPrevious && !Setting.IgnoreRouteHistory)
+            if (!ignoreHistory && !Setting.IgnoreRouteHistory)
             {
                 History.Record(route, parameters);
             }
-
             await Storage.SaveCurrentRouteAsync(route, parameters);
-
-            // Notify UI navigator
             NavigationState.Set(route, parameters);
-
             await OnAfterNavigateAsync(route, parameters);
         }
     }

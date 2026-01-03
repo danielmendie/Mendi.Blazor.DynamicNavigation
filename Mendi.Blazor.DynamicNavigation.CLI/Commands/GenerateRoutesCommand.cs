@@ -129,7 +129,7 @@ namespace Mendi.Blazor.DynamicNavigation.CLI.Commands
                         foreach (var property in properties)
                         {
                             sb.AppendLine("{");
-                            sb.AppendLine($"\"{property.Name}\", \"Id\"");
+                            sb.AppendLine($"\"{property.Name}\", \"\"");
                             if (loopProps != totalProps)
                             {
                                 sb.AppendLine("},");

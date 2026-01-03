@@ -1,0 +1,6 @@
+{
+  "AppName": "My Country App",
+  "AppDescription": "This is an interactive country explorer app that lets users search for any country and instantly see its codes, capital, currency, region, states, cities with coordinates, and detailed timezone information in a single, easy-to-use dashboard. It is also to shows a live demo of the Mendi.Blazor.DynamicNavigation nuget package.",
+  "SocialMediaHandles": [ "https://linkedin.com/in/danielmendie", "https://facebook.com/danielmendie.3", "https://x.com/danielmendii" ],
+  "Address": "Nigeria"
+}

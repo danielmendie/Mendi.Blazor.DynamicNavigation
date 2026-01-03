@@ -1,0 +1,59 @@
+﻿@using CountryApp.Abstractions.Enums
+@using CountryApp.Abstractions.Helpers
+<PageTitle>Dashboard - My Country App</PageTitle>
+
+<div class="col-sm-8 col-xs-12 ml-auto mr-auto mt-auto mb-auto">
+
+    <h1>My Overview</h1>
+    <p class="text-muted mb-5">Welcome to the My Country App. Here's an overview of your account quota.</p>
+
+    <div class="row">
+        <div class="col-sm-5 col-xs-12">
+            <h5 class="text-muted"><strong>Quick Start</strong></h5>
+            <MudChip T="string" Size="Size.Medium" Color="Color.Info" Class="text-wrap mr-2" OnClick="() => NavigateToAsync(nameof(SupportStart))" Text="Help Article" Icon="@Icons.Material.TwoTone.HelpCenter" />
+            <MudChip T="string" Size="Size.Medium" Color="Color.Success" Class="text-wrap mr-2" OnClick="() => NavigateToAsync(nameof(CountryStart))" Text="Search Country" Icon="@Icons.Material.TwoTone.Language" />
+
+            <h5 class="mt-5">Recent</h5>
+            @if (CurrentUserActivities.Count() > 0)
+            {
+                foreach (var transaction in CurrentUserActivities)
+                {
+                    <MudCard Elevation="25" Class="mb-3">
+                        <MudCardContent>
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <div>
+                                    <h5 class="text-muted">@DateHelper.FormatToHumanReadable(transaction.ActivityType.ToString())</h5>
+                                </div>
+                                @DateHelper.GetRelativeTime(transaction.CreatedOn)
+                            </div>
+                            <MudText Typo="Typo.body2">@transaction.Description</MudText>
+                        </MudCardContent>
+                    </MudCard>
+                }
+            }
+            else
+            {
+                <NoDataDisplay Header="No Recent Activity"
+                               Message="Get started with My Country App today."
+                               Icon="@Icons.Material.TwoTone.History" />
+            }
+
+          
+        </div>
+        <div class="col-sm-7 col-xs-12">
+            <div class="card">
+                <div style="width: 100%;overflow-x: auto;display: flex;flex-direction: column;align-items: center;">
+                    <MudChart ChartType="ChartType.Line" ChartSeries="@GraphData.Series" XAxisLabels="@GraphData.SeriesLabels" Width="500" Height="300" />
+                </div>
+
+                <div class="card-header"><h5>@DateHelper.ConvertMonthNumberToMonthName(DateTime.Now.Month, true) Quota</h5></div>
+                <div class="card-body">
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+</div>
