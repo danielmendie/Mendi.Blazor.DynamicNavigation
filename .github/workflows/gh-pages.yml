@@ -2,7 +2,7 @@ name: Deploy CountryApp to GitHub Pages
 
 on:
   push:
-    branches: [ "main", "refactor-dev" ]
+    branches: [ "main" ]
   workflow_dispatch:
 
 permissions:
