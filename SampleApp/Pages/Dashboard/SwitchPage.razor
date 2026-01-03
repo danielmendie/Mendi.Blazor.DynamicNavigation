@@ -1,0 +1,71 @@
+﻿
+<div class="card m-3">
+    @if (ShowPassword && SelectedProfile != null)
+    {
+        <div class="card-body">
+            <EditForm OnValidSubmit="OnValidSubmit" Model="EditContext">
+                <DataAnnotationsValidator />
+                <p class="text-center f-w-500 text-muted">Your account's verification on account switch is active, please verify to access @SelectedProfile.Email</p>
+               
+                <MudTextField T="string" @bind-Value="EditContext.Password" Label="Password" For="() => EditContext.Password" HelperText="Any secure random password" HelperTextOnFocus InputType="InputType.Password"></MudTextField>
+               
+                <div class="d-grid mt-4">
+                    <MudButton Size="Size.Large" ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" Class="">
+                            <MudText Class="ms-2">Verify</MudText>
+                    </MudButton>
+                </div>
+            </EditForm>
+        </div>
+    }
+    else
+    {
+        <div class="card-body pb-0">
+            <div class="d-flex align-items-center justify-content-between">
+                <h5 class="mb-0">Profiles</h5>
+            </div>
+        </div>
+        <ul class="list-group list-group-flush border-top-0">
+            @foreach (var item in DisplayProfiles)
+            {
+                <li class="list-group-item">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <img src="@ImagePath(item.DisplayImage)" alt="@item.Email user-image"
+                                 class="user-avtar rounded wid-50 hie-50">
+                        </div>
+                        <div class="flex-grow-1 mx-2" style="cursor:pointer" @onclick="async () => await OnSwitchAccount(item)">
+                            <h6 class="mb-1">@(item.Name ?? item.Email)</h6>
+                            <p class="mb-0">
+                                @if (item.Email == CurrentUser.Email)
+                                {
+                                    <span class="text-primary">Active</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Visitor</span>
+                                }
+                            </p>
+                        </div>
+                        <div class="flex-shrink-0">
+                            <p class="text-muted mb-0">
+                                @if (item.Email == CurrentUser.Email)
+                                {
+                                    <span class="badge bg-danger rounded-pill" style="cursor:pointer"
+                                          @onclick="async () => await SignOut(true)">Sign Out</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">@Abstractions.Helpers.DateHelper.GetRelativeTime(item.LastLoggedIn)</span>
+                                }
+                            </p>
+                        </div>
+                    </div>
+                </li>
+            }
+        </ul>
+        <hr />
+        <div class="card-body pb-0 pt-0">
+            <p>To create a new profile, please sign out from any active profile account and login using a new random email.</p>
+        </div>
+    }
+</div>

@@ -1,0 +1,35 @@
+﻿
+<div class="col-sm-8 col-xs-12 ml-auto mr-auto mt-auto mb-auto">
+    @if (IsReader)
+    {
+        <MudChip T="string" Icon="@Icons.Material.TwoTone.ArrowBack" Class="pc-sidebar-popup mb-3" Size="Size.Medium" Variant="Variant.Text" Text="Back to Category" Ripple="false" Style="background-color:transparent;" OnClick="()=> IsReader = false" />
+
+        @RenderRawHtml
+    }
+    else
+    {
+        <h1>@Header</h1>
+        <p class="text-muted mb-5">Search through our help category in @Header</p>
+
+        <div class="card">
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    @if (Articles != null)
+                    {
+                        int count = 0;
+                        foreach (var item in Articles)
+                        {
+                            count++;
+                            <li class="list-group-item px-0 @(Articles.Count == 1 ? "pt-0 pb-0" : count == 1 ? "pt-0" : count == Articles.Count ? "pb-0" : "")"
+                                @onclick="() => OnReadArticle(item)">
+                                <div class="d-inline-block text-wrap">
+                                    <MudIcon Icon="@Icons.Material.TwoTone.Article" /> @item.Title
+                                </div>
+                            </li>
+                        }
+                    }
+                </ul>
+            </div>
+        </div>
+    }
+</div>

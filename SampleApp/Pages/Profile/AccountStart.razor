@@ -1,0 +1,110 @@
+﻿@using CountryApp.Abstractions.Models
+@using CountryApp.Pages.Profile.Pages
+<PageTitle>Account Setting - My Country App</PageTitle>
+
+<ScriptLoader @ref=@scriptLoader Code="
+function OpenFilePicker() {
+    var picker =document.getElementById('filePicker');
+    picker.click();
+}
+" />
+
+    <InputFile class="invisible" id="filePicker" OnChange="OnMediaUpload" accept="image/*" />
+<div class="col-sm-8 col-xs-12 ml-auto mr-auto mt-auto mb-auto">
+    <div class="mb-2" style="margin-top:-20px;">
+        <div class="col-sm-8 col-xs-12 ml-auto mr-auto mt-auto mb-auto">
+            <div class="text-center">
+                <div class="edit-profile">
+                    <div class="picture-container">
+                        <div class="picture">
+                            <img src=@ImagePath() class="picture-src" id="imagePreview" title="profile picture" @onclick="OpenFilePicker" />
+                        </div>
+                    </div>
+                </div>
+                <h2 class="mb-0 ms-2 me-2 mt-3">
+                    @CurrentUser.Name
+                </h2>
+                <p class="text-primary"><MudIcon Icon="@Icons.Material.TwoTone.VerifiedUser" Color="Color.Primary" /> Visitor</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-6 col-xs-12">
+            <div class="card">
+                <div class="card-header"><h5>Profile</h5></div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item px-0 pt-0" @onclick="(() => Goto(nameof(AccountProfile)))">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div>
+                                    <p class="mb-1"><MudIcon Icon="@Icons.Material.TwoTone.AccountCircle" /> Account Profile </p>
+                                    <p class="text-muted text-sm mb-0">Name, gender, and phone number</p>
+                                </div>
+                                <div class="form-check form-switch p-0">
+                                    <MudIcon Icon="@Icons.Material.TwoTone.NavigateNext" />
+                                </div>
+                            </div>
+                        </li>
+                        <li class="list-group-item px-0 pb-0">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div>
+                                    <p class="mb-1">Remember Activities</p>
+                                    <p class="text-muted text-sm mb-0">Remember my last activity - This is always on for this app</p>
+                                </div>
+                                <div class="form-check form-switch p-0">
+                                    <input class="form-check-input h4 position-relative m-0" type="checkbox" role="switch" checked disabled>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+        <div class="col-sm-6 col-xs-12">
+            <div class="card">
+                <div class="card-header"><h5>Security</h5></div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item px-0 pt-0">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div>
+                                    <p class="mb-1"><MudIcon Icon="@Icons.Material.TwoTone.Password" /> Change Password</p>
+                                    <p class="text-muted text-sm mb-0">This feature is not available in visitor mood</p>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="list-group-item px-0 pb-0">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div>
+                                    <p class="mb-1">Access Approvals</p>
+                                    <p class="text-muted text-sm mb-0">
+                                        Require verification on profile switch.
+                                    </p>
+                                </div>
+                                <div class="form-check form-switch p-0">
+                                    <input class="form-check-input h4 position-relative m-0" type="checkbox" role="switch" checked="@CurrentUser.RequireApproval" @onchange="() => UpdateUserData(nameof(Profile.RequireApproval), !CurrentUser.RequireApproval)">
+                                </div>
+                            </div>
+                        </li>
+
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="row g-3">
+        <div class="col-12">
+            <div class="card shadow-none border mb-0" style="border:1px dashed red !important;">
+                <div class="card-body">
+                    <h6 class="mb-3">Delete Account</h6>
+                    <p class="mb-3">Deleting your account will remove all the content associated with it.</p>
+                    <button class="btn btn-danger" @onclick="(() => Goto(nameof(AccountDelete)))">Delete Account</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

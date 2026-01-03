@@ -1,0 +1,16 @@
+[
+  {
+    "parentId": 1,
+    "category": "Get Started",
+    "title": "Introduction",
+    "data": "<h2>Welcome to CountryApp</h2>\n<p>CountryApp is a simple Blazor sample application that demonstrates how the <code>Mendi.Blazor.DynamicNavigation</code> NuGet package works in a real app.\n It lets you explore countries, view details, and navigate between pages using a fully dynamic, data-driven navigation menu.</p>\n\n<h3>What you can do with CountryApp:</h3>\n<ul><li>Browse a list of countries and view key information</li><li>Navigate between pages using dynamic navigation built with the package</li><li>See how routes, labels, and icons can be defined from configuration</li><li>Use it as a reference for integrating dynamic navigation into your own app</li></ul>\n\n<h3>Getting Started:</h3>\n<ol><li>Clone or download the CountryApp sample from the GitHub repository.</li><li>Open the solution in Visual Studio or your preferred IDE.</li><li>Restore NuGet packages, build the solution, and run the project.</li><li>Explore the navigation menu to see how the dynamic navigation behaves at runtime.</li></ol>\n\n<h3>Next Steps:</h3>\n<p>After exploring CountryApp, review the source code and configuration to see how the navigation items are defined and bound to <code>Mendi.Blazor.DynamicNavigation</code>.\n You can then adapt the same approach in your own application.</p>",
+    "sort": 1
+  },
+  {
+    "parentId": 1,
+    "category": "Get Started",
+    "title": "Using Mendi.Blazor.DynamicNavigation",
+    "data": "<h2>Mendi.Blazor.DynamicNavigation</h2>\n<p><code>Mendi.Blazor.DynamicNavigation</code> is a Blazor library that helps you build dynamic, data-driven navigation menus (sidebars, headers, etc.) from configuration or backend data instead of hardcoding links.</p>\n\n<h3>Get Started</h3>\n<ol><li>Install the NuGet package:\n<pre><code>dotnet add package Mendi.Blazor.DynamicNavigation</code></pre></li><li>Add the library to your Blazor application services in <code>Program.cs</code> and register the components in your layout.</li><li>Configure your navigation items (for example JSON, database, or in code) and bind them to the dynamic navigation component.</li>\n</ol>\n\n<h3>GitHub Repository</h3>\n<p>For full installation instructions, examples, and source code, visit the GitHub repo:<br />\n<a href=\"https://github.com/danielmendie/Mendi.Blazor.DynamicNavigation\" target=\"_blank\" rel=\"noopener\">https://github.com/danielmendie/Mendi.Blazor.DynamicNavigation</a>\n</p>\n\n<h3>Tip:</h3>\n<p>Check the README and sample projects in the repository for ready-to-use configurations and best practices.</p>",
+    "sort": 2
+  }
+]

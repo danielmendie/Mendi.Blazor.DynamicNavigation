@@ -1,0 +1,30 @@
+[
+  {
+    "name": "Overview",
+    "children": [],
+    "icon": "#custom-status-up",
+    "path": "StartPage",
+    "isExpanded": false
+  },
+  {
+    "name": "Search",
+    "icon": "#custom-flag",
+    "path": "CountryStart",
+    "children": [],
+    "isExpanded": false
+  },
+  {
+    "name": "Support",
+    "children": [],
+    "icon": "#custom-24-support",
+    "path": "SupportStart",
+    "isExpanded": false
+  },
+  {
+    "name": "About",
+    "children": [],
+    "icon": "#custom-notification-status",
+    "path": "AboutStart",
+    "isExpanded": false
+  }
+]
