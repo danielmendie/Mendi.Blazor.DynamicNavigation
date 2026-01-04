@@ -1,5 +1,4 @@
-﻿using CountryApp.Abstractions.Models;
-using CountryApp.Layout;
+﻿using CountryApp.Layout;
 using Mendi.Blazor.DynamicNavigation;
 using Microsoft.AspNetCore.Components.Forms;
 
@@ -17,7 +16,7 @@ namespace CountryApp.Pages.Profile
                 return UploadedImage;
 
             var path = string.IsNullOrWhiteSpace(CurrentUser.DisplayImage)
-                  ? "/assets/images/user/guest.bmp"
+                  ? "assets/images/user/guest.bmp"
                   : CurrentUser.DisplayImage;
 
             return path;

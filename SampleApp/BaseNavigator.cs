@@ -44,7 +44,7 @@ public class BaseNavigator : BlazorDynamicNavigatorBase
         await LocalStorage.SetItemAsync(ConfigType.UserActivitiesStore, activities);
         await LocalStorage.SetItemAsync(ConfigType.IdentityUserStore, clearUserState ? null : user);
         await NavigateToAsync(nameof(StartPage));
-        NavigationManager.NavigateTo("/", true);
+        NavigationManager.NavigateTo(NavigationManager.BaseUri, true);
     }
 
     public List<LocationSearchItem> UserFavorites

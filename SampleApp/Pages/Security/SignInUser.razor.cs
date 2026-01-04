@@ -35,7 +35,7 @@ namespace CountryApp.Pages.Security
                 await LocalStorage.SetItemAsync(ConfigType.UserProfilesStore, profiles);
             }
 
-            NavigationManager.NavigateTo("/", true);
+            NavigationManager.NavigateTo(NavigationManager.BaseUri, true);
             IsBusy = false;
         }
 

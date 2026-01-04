@@ -47,7 +47,7 @@ namespace CountryApp.Pages.Dashboard
         }
 
         string ImagePath(string? displayData) => string.IsNullOrWhiteSpace(displayData)
-                  ? "/assets/images/user/guest.bmp"
+                  ? "assets/images/user/guest.bmp"
                   : displayData;
 
         class VerificationModel
