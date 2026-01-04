@@ -1,7 +1,7 @@
 {
   "mainAssemblyName": "CountryApp",
   "resources": {
-    "hash": "sha256-vrtmcx3R9qOK4mrEOu2LSLxqlh1z41xUS5Pk87YKCf8=",
+    "hash": "sha256-ZENs9SxRA7MD+p6Bg2LaslqIZ9T7YniHsnpYuBULkUw=",
     "jsModuleNative": {
       "dotnet.native.js": "sha256-vtotCeXt2UD6oc459laJT32vBgigZ+eLoUmdeFkvYDk="
     },
@@ -97,7 +97,7 @@
       "System.wasm": "sha256-I4hhyMuUoHdrzDopL9tlnkL/Skg+0OO+gmkOXNT3dcg=",
       "netstandard.wasm": "sha256-8h+nABruZnGXP2G90Llx7edVca4fzWdXinuUzwxKjG0=",
       "System.Private.CoreLib.wasm": "sha256-7iA5Pnzwi+Cx7Yt1RDeNeKXyBLAJKxvgOXnyOlXcHVw=",
-      "CountryApp.wasm": "sha256-awPaTAr0lLbhRHIn09qLutjOCWrM9qK9DUEvKPInMks="
+      "CountryApp.wasm": "sha256-8D4fUpZtxhl+LvKAJky/JR7YUua4rvhUCm5NflgvWmg="
     }
   },
   "cacheBootResources": true,
