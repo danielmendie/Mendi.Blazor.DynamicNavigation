@@ -24,12 +24,12 @@ namespace CountryApp.Pages.Security
             activities.Add(new Activity { ActivityType = EnumActivity.SignIn, CreatedOn = DateTime.UtcNow, Description = $"You signed in using {EditContext.Email}", CreatedBy = EditContext.Email });
             await LocalStorage.SetItemAsync(ConfigType.UserActivitiesStore, activities);
 
-            await UpdateUserData(nameof(Abstractions.Models.Profile.IsLoggedIn), true);
             await UpdateUserData(nameof(Abstractions.Models.Profile.Email), EditContext.Email);
+            await UpdateUserData(nameof(Abstractions.Models.Profile.IsLoggedIn), true);
             await UpdateUserData(nameof(Abstractions.Models.Profile.LastLoggedIn), DateTime.UtcNow);
 
             var profiles = Profiles;
-            if(!profiles.Any(g=>g.Email == EditContext.Email))
+            if (!profiles.Any(g => g.Email == EditContext.Email))
             {
                 profiles.Add(CurrentUser!);
                 await LocalStorage.SetItemAsync(ConfigType.UserProfilesStore, profiles);

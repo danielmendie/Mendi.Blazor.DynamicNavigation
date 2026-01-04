@@ -69,7 +69,7 @@ public class BaseNavigator : BlazorDynamicNavigatorBase
 
     public Profile CurrentUser
     {
-        get => SyncLocalStorage.GetItem<Profile>(ConfigType.IdentityUserStore)!; set { InvokeAsync(StateHasChanged); }
+        get => SyncLocalStorage.GetItem<Profile>(ConfigType.IdentityUserStore) ?? new Profile(); set { InvokeAsync(StateHasChanged); }
     }
 
     public async Task UpdateUserData(string key, object value)
@@ -80,8 +80,15 @@ public class BaseNavigator : BlazorDynamicNavigatorBase
         await LocalStorage.SetItemAsync(ConfigType.IdentityUserStore, updatedUserData);
         var currentUser = CurrentUser;
         var profiles = Profiles;
-        var profileIndex = profiles.IndexOf(profiles.First(f => f.Email == currentUser.Email));
-        profiles[profileIndex] = currentUser;
+        if (profiles.Count > 0)
+        {
+            var profileIndex = profiles.IndexOf(profiles.First(f => f.Email == currentUser.Email));
+            profiles[profileIndex] = currentUser;
+        }
+        else
+        {
+            profiles.Add(currentUser);
+        }
         await LocalStorage.SetItemAsync(ConfigType.UserProfilesStore, profiles);
     }
 
