@@ -5,6 +5,11 @@
 
 >This library lets you build **single‑URL, multi‑page** Blazor apps by routing between components without changing the browser address or exposing URL parameters. It also persists navigation state and helps prevent URL tampering and hijacking.
 
+## 🌐 Live Sample App
+
+[https://danielmendie.github.io/Mendi.Blazor.DynamicNavigation/](https://danielmendie.github.io/Mendi.Blazor.DynamicNavigation/)
+
+
 ## 🧑‍💻Platforms
 - [x] Blazor Server
 - [x] Blazor WebAssembly
