@@ -1,7 +1,7 @@
 {
   "mainAssemblyName": "CountryApp",
   "resources": {
-    "hash": "sha256-L9KkoGpOhDa4EWayuI8Yomv7cIQpngmT5+pMNmZRwaw=",
+    "hash": "sha256-XU3PsTZQhk2ST45pWL+F50RhF7rwWQinHLTpb6zW9q8=",
     "jsModuleNative": {
       "dotnet.native.js": "sha256-vtotCeXt2UD6oc459laJT32vBgigZ+eLoUmdeFkvYDk="
     },
@@ -19,8 +19,6 @@
     "coreAssembly": {},
     "assembly": {
       "Blazored.LocalStorage.wasm": "sha256-QrIDftiTupcZwi4MrWifwVNJMM8Uh5LDGQMfR245BH4=",
-      "Mendi.Blazor.DynamicNavigation.wasm": "sha256-zsDDNbYvT1cgA17AFIKQQkTstCFdtB7yEy1aBESbr2Y=",
-      "Mendi.Blazor.DynamicNavigation.Common.wasm": "sha256-CUnJyfHPrzmsPTNEGG/0047/2Op1lytSTJ6d2DONwDk=",
       "System.Net.Http.Formatting.wasm": "sha256-UnnsaNnAtvbPmwU+W9Zj7sdU05nYJziM6pYpbeaK1dg=",
       "Microsoft.AspNetCore.Authorization.wasm": "sha256-+csJanfUYCrCfLJvMgvNFChh2DNjDOdoaLcPG177lEM=",
       "Microsoft.AspNetCore.Components.wasm": "sha256-aAPjp9XxFGYNczOHfmZJqJ+sW4QPcwbWUp/aHC/SsKw=",
@@ -52,6 +50,8 @@
       "MudBlazor.wasm": "sha256-3N9KwKhNGX7hLPZC2U89lekw0wWz2JBSwU3thZ90k4o=",
       "Newtonsoft.Json.wasm": "sha256-PaicHOw1U7HF05kEvZI0Rgg1nwdA8hrzbzdkw1qgUuU=",
       "Newtonsoft.Json.Bson.wasm": "sha256-VxfTY/Ckiz5BNvQbcB31OYXhY4HGHJtODt5rRbjDIK0=",
+      "PageFlow.Blazor.wasm": "sha256-DsElQ8jGFwLhOM1WT5UqG33hX+3s3DO0z5QfSiMJp0I=",
+      "PageFlow.Blazor.Common.wasm": "sha256-cxZmDXjFMd0Sx7xsp7NQSKXgoJc8Piyk1y3dK9ryCKE=",
       "System.IdentityModel.Tokens.Jwt.wasm": "sha256-TtIA6JnlLwkj83eTcFqAfYKfbz9SJwm4Sndcx37O8po=",
       "Microsoft.CSharp.wasm": "sha256-RSM9bLqHq1CY3b3BGT2IJO9Is3QoOl1xdNRJdKdRmzo=",
       "System.Buffers.wasm": "sha256-9xJP0UHYsBz0bPTH1wuP4JQn6pC0xqvkxWKRAKg764U=",
@@ -97,7 +97,7 @@
       "System.wasm": "sha256-I4hhyMuUoHdrzDopL9tlnkL/Skg+0OO+gmkOXNT3dcg=",
       "netstandard.wasm": "sha256-8h+nABruZnGXP2G90Llx7edVca4fzWdXinuUzwxKjG0=",
       "System.Private.CoreLib.wasm": "sha256-7iA5Pnzwi+Cx7Yt1RDeNeKXyBLAJKxvgOXnyOlXcHVw=",
-      "CountryApp.wasm": "sha256-vDtV48q3Rz5V+DJ2IAo5fafbCD2RT8KuSgdfZrGf2fg="
+      "CountryApp.wasm": "sha256-I87bFq5GsRIUqc3AorN7deenNaAQ0EdhOK7dtkuxz7g="
     }
   },
   "cacheBootResources": true,
