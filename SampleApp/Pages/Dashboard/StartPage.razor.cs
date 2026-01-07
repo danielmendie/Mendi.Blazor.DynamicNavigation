@@ -1,10 +1,10 @@
 ﻿using CountryApp.Abstractions.Models;
-using Mendi.Blazor.DynamicNavigation;
 using MudBlazor;
+using PageFlow.Blazor;
 
 namespace CountryApp.Pages.Dashboard
 {
-    [NavigatorRoutableComponent("Overview", true)]
+    [PageFlowRoutableComponent("Overview", true)]
     public partial class StartPage
     {
         IEnumerable<Activity> CurrentUserActivities = [];
@@ -27,8 +27,8 @@ namespace CountryApp.Pages.Dashboard
 
         public ChartData BuildQuotaChartData()
         {
-            var now = DateTime.UtcNow;   
-            var start = new DateTime(now.Year, now.Month, 1).AddMonths(-11); 
+            var now = DateTime.UtcNow;
+            var start = new DateTime(now.Year, now.Month, 1).AddMonths(-11);
             var months = Enumerable.Range(0, 12).Select(i => start.AddMonths(i)).ToList();
             var labels = months.Select(d => d.ToString("MMM")).ToArray();
             var grouped = UserQuota
@@ -40,7 +40,7 @@ namespace CountryApp.Pages.Dashboard
                 );
 
             var current = grouped.TryGetValue((now.Year, now.Month), out var currentCount);
-            var data = months .Select(m =>
+            var data = months.Select(m =>
                 {
                     grouped.TryGetValue((m.Year, m.Month), out var count);
                     return (double)count;

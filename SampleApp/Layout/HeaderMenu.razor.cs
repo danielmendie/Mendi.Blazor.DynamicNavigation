@@ -1,7 +1,7 @@
 ﻿using CountryApp.Abstractions.Constants;
 using CountryApp.Abstractions.Models;
-using Mendi.Blazor.DynamicNavigation;
 using Microsoft.JSInterop;
+using PageFlow.Blazor;
 
 namespace CountryApp.Layout
 {
@@ -15,7 +15,7 @@ namespace CountryApp.Layout
         private bool RequiresRebinding = true;
         IEnumerable<NavMenuItem> MenuItems = [];
         private CancellationTokenSource? debounceCts;
-        RoutePageInfo? Route;
+        PageFlowInfo? Route;
 
         protected override async Task OnInitializedAsync()
         {

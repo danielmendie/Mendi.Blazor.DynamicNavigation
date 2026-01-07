@@ -1,11 +1,11 @@
 ﻿using CountryApp.Abstractions.Constants;
 using CountryApp.Abstractions.Models;
-using Mendi.Blazor.DynamicNavigation;
 using Microsoft.AspNetCore.Components;
+using PageFlow.Blazor;
 
 namespace CountryApp.Pages.About
 {
-    [NavigatorRoutableComponent("About App", false)]
+    [PageFlowRoutableComponent("About App", false)]
     public partial class AboutStart
     {
         MarkupString RenderTermsOfService = new();

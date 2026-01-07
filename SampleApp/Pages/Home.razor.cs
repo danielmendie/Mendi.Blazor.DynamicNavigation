@@ -2,7 +2,6 @@
 using CountryApp.Abstractions.Constants;
 using CountryApp.Abstractions.Models;
 using CountryApp.Pages.Dashboard;
-using System.Reflection.PortableExecutable;
 
 namespace CountryApp.Pages
 {
@@ -15,7 +14,7 @@ namespace CountryApp.Pages
         protected override async Task OnInitializedAsync()
         {
             await EnsureIndexBuiltAsync();
-            await OnAppNavigationSetup();
+            await OnAppFlowSetup();
             OnNavigationStateChanged();
             NavigationState.Changed += OnNavigationStateChanged;
         }

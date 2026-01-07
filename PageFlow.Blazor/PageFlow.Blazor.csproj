@@ -1,0 +1,62 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+	<PropertyGroup>
+		<TargetFrameworks>net9.0;net8.0</TargetFrameworks>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<Title>PageFlow.Blazor</Title>
+		<Authors>Daniel Mendie</Authors>
+		<Description>This package allows dynamic routing in your Blazor application. It configures your app to route to pages within your application without changing page URLs thereby making it truly single page. It is safe and also prevents URL tempering and hijacking</Description>
+		<Copyright>2024</Copyright>
+		<PackageProjectUrl>https://www.nuget.org/packages/PageFlow.Blazor</PackageProjectUrl>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<RepositoryUrl>https://github.com/danielmendie/PageFlow</RepositoryUrl>
+		<PackageTags>Web Assembly</PackageTags>
+		<PackageLicenseFile>LICENSE</PackageLicenseFile>
+		<Version>2.0.0</Version>
+		<PackageIcon>icon.png</PackageIcon>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <None Include="..\icon.png">
+	    <Pack>True</Pack>
+	    <PackagePath>\</PackagePath>
+	  </None>
+	  <None Include="..\LICENSE">
+	    <Pack>True</Pack>
+	    <PackagePath>\</PackagePath>
+	  </None>
+	  <None Include="..\README.md">
+	    <Pack>True</Pack>
+	    <PackagePath>\</PackagePath>
+	  </None>
+	</ItemGroup>
+
+
+	<ItemGroup>
+		<SupportedPlatform Include="browser" />
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(TargetFramework)'=='net8.0'">
+		<PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="8.0.22" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.22" />
+		<PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="8.0.1" />
+	</ItemGroup>
+	<ItemGroup Condition="'$(TargetFramework)'=='net9.0'">
+		<PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="9.0.11" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="9.0.11" />
+		<PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="9.0.11" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\PageFlow.Blazor.Common\PageFlow.Blazor.Common.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Update="wwwroot\LocalStorageAccessor.js">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
+	</ItemGroup>
+
+</Project>

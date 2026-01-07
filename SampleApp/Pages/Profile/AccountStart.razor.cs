@@ -1,10 +1,10 @@
 ﻿using CountryApp.Layout;
-using Mendi.Blazor.DynamicNavigation;
 using Microsoft.AspNetCore.Components.Forms;
+using PageFlow.Blazor;
 
 namespace CountryApp.Pages.Profile
 {
-    [NavigatorRoutableComponent("Account Setting", false)]
+    [PageFlowRoutableComponent("Account Setting", false)]
     public partial class AccountStart
     {
         ScriptLoader scriptLoader = null!;

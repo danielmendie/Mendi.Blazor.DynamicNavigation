@@ -1,11 +1,11 @@
 ﻿using CountryApp.Abstractions.Constants;
 using CountryApp.Abstractions.Models;
-using Mendi.Blazor.DynamicNavigation;
 using Newtonsoft.Json;
+using PageFlow.Blazor;
 
 namespace CountryApp.Pages.Search
 {
-    [NavigatorRoutableComponent("Your Favorites", false)]
+    [PageFlowRoutableComponent("Your Favorites", false)]
     public partial class FavoriteStart
     {
         List<LocationSearchItem> Bookmarks = [];

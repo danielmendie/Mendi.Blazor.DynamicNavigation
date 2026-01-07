@@ -4,13 +4,13 @@ using CountryApp.Abstractions.Models;
 using CountryApp.Abstractions.Services.Data;
 using CountryApp.Abstractions.Services.Providers;
 using CountryApp.Business;
-using Mendi.Blazor.DynamicNavigation;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using MudBlazor;
 using MudBlazor.Services;
+using PageFlow.Blazor;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -20,7 +20,7 @@ var appSettings = builder.Configuration.Get<AppSettings>() ?? new AppSettings();
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
 //add dynamic navigation services
-builder.Services.AddBlazorDynamicNavigator(opt => opt.IgnoreRouteHistory = false);
+builder.Services.AddBlazorPageFlow();
 //add mudblazor services
 builder.Services.AddMudServices(config =>
 {

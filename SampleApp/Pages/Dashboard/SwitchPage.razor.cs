@@ -1,12 +1,12 @@
 ﻿using CountryApp.Abstractions.Constants;
 using CountryApp.Abstractions.Enums;
 using CountryApp.Abstractions.Models;
-using Mendi.Blazor.DynamicNavigation;
+using PageFlow.Blazor;
 using System.ComponentModel.DataAnnotations;
 
 namespace CountryApp.Pages.Dashboard
 {
-    [NavigatorRoutableComponent("Switch Apps", false)]
+    [PageFlowRoutableComponent("Switch Apps", false)]
     public partial class SwitchPage
     {
         bool ShowPassword;

@@ -1,11 +1,11 @@
 ﻿using CountryApp.Abstractions.Constants;
 using CountryApp.Abstractions.Models;
-using Mendi.Blazor.DynamicNavigation;
 using Microsoft.AspNetCore.Components;
+using PageFlow.Blazor;
 
 namespace CountryApp.Pages.Support.Pages
 {
-    [NavigatorRoutableComponent("Help Article", false)]
+    [PageFlowRoutableComponent("Help Article", false)]
     public partial class ArticleView
     {
         [Parameter] public string ParentId { get; set; } = null!;

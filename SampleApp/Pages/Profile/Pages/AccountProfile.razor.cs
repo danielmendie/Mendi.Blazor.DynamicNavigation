@@ -1,12 +1,12 @@
 ﻿using CountryApp.Abstractions.Constants;
 using CountryApp.Abstractions.Enums;
 using CountryApp.Abstractions.Models;
-using Mendi.Blazor.DynamicNavigation;
+using PageFlow.Blazor;
 using System.ComponentModel.DataAnnotations;
 
 namespace CountryApp.Pages.Profile.Pages
 {
-    [NavigatorRoutableComponent("Profile Update", false)]
+    [PageFlowRoutableComponent("Profile Update", false)]
     public partial class AccountProfile
     {
         bool IsLoading;

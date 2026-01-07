@@ -1,12 +1,12 @@
 ﻿using CountryApp.Abstractions.Constants;
 using CountryApp.Abstractions.Models;
 using CountryApp.Pages.Support.Pages;
-using Mendi.Blazor.DynamicNavigation;
 using Newtonsoft.Json;
+using PageFlow.Blazor;
 
 namespace CountryApp.Pages.Support
 {
-    [NavigatorRoutableComponent("Support", false)]
+    [PageFlowRoutableComponent("Support", false)]
     public partial class SupportStart
     {
         List<Article>? Articles;

@@ -1,14 +1,13 @@
 ﻿using CountryApp.Abstractions.Constants;
 using CountryApp.Abstractions.Enums;
 using CountryApp.Abstractions.Models;
-using Mendi.Blazor.DynamicNavigation;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Forms;
 using Newtonsoft.Json;
+using PageFlow.Blazor;
 
 namespace CountryApp.Pages.Search
 {
-    [NavigatorRoutableComponent("Country Search", false)]
+    [PageFlowRoutableComponent("Country Search", false)]
     public partial class CountryStart
     {
         [Parameter] public string? Favorite { get; set; }
