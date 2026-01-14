@@ -33,7 +33,7 @@
     {
         public int AppId { get; set; }
         public string PageName { get; set; } = null!;
-        public required Type ComponentType { get; init; }
+        public Type ComponentType { get; set; } = null!;
         public string Component { get; set; } = null!;
         public int? Action { get; set; }
         public bool IsDefault { get; set; }

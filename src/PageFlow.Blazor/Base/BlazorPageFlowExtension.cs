@@ -27,6 +27,7 @@ namespace PageFlow.Blazor
             services.AddScoped<ILocalStorageProvider, LocalStorageProvider>();
             services.AddScoped<IRoutesProvider, RouteProvider>();
             services.AddScoped<IRouteResolver, RouteResolver>();
+            services.AddScoped<IPageFlowNavigator, PageFlowNavigator>();
             return services;
         }
     }

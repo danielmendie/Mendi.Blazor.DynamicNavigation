@@ -23761,11 +23761,20 @@ pre[class*=language-]:after, pre[class*=language-]:before {
     }
 }
 
+.loader-container {
+    align-content: center;
+    min-height: 100vh;
+    background: url(../images/map.svg) no-repeat 50%;
+    background-size: cover;
+}
+
 .pc-container {
     position: relative;
     top: 74px;
     margin-left: 280px;
     min-height: calc(100vh - 74px);
+    background: url(../images/map.svg) no-repeat 50%;
+    background-size: cover;
 }
 
     .pc-container .pc-content {
@@ -28543,7 +28552,7 @@ select.custom-select, select.dataTable-input, select.dataTable-selector, select.
 
         .auth-main .auth-wrapper.v1 .auth-form {
             flex-direction: column;
-            background: url(../images/authentication/img-auth-bg.jpg);
+            background: url(../images/map.svg);
             background-size: cover;
             min-height: 100vh;
             padding: 24px;
@@ -28740,7 +28749,7 @@ select.custom-select, select.dataTable-input, select.dataTable-selector, select.
     }
 
 .soon-card-1 {
-    background: url(../images/authentication/img-auth-bg.jpg);
+    background: url(../images/map.svg);
     min-height: 100vh;
     background-size: cover;
     justify-content: center

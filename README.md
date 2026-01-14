@@ -37,7 +37,24 @@ builder.Services.AddBlazorPageFlow();
 To prevent the app from remembering last visited page, set option **IgnoreRouteHistory** to True
 
 
-**STEPS HIGHLIGHTED HERE CAN BE DONE AUTOMATICALLY USING THE CLI TOOL**
+Using PageFlow is as easy as Injecting the `FlowUI` and calling `IPageFlowNavigator`
+
+1. Add the **FlowUI** component to the Home.razor or Index.razor file `<PageFlow.Blazor.FlowUI />`
+
+2. Inject IPageFlowNavigator into your page 
+```csharp
+[Inject] public IPageFlowNavigator Navigator { get; set; } = default!;
+```
+
+3. Start navigating
+```csharp
+await Navigator.NavigateToAsync<HelloPage>(new { OrderId = "9CE48C35" });
+```
+
+Where **HelloPage** is the razor component and its expected parameters.
+
+
+### FOR FULL INTEGRATION WITH PAGEFLOW AND THE CLI TOOL
 
 1. Create a base class in the root directory and inherit the `BlazorPageFlowBase` class then add the `PageFlowBaseComponent` attribute to your base component class. Your class should look similar to this:
 
@@ -58,11 +75,9 @@ The `PageFlowBaseComponent` attribute should be specified on the custom class ac
 @using PageFlow.Blazor
 @inherits MyBaseComponent
 ```
-MyBaseComponent - This should be the name of your base component class(however you had called it)
+MyBaseComponent - This should be the name of your base component class(however you had called it) 
 
-3. Add the **FlowUI** component to the Home.razor or Index.razor file `<PageFlow.Blazor.FlowUI />`
-
-4. In the Home.razor or Index.razor override OnInitializedAsync() and call the OnAppNavigationSetup(). You only have to add this call once.
+3. In the Home.razor or Index.razor override OnInitializedAsync() and call the OnAppNavigationSetup(). You only have to add this call once.
 ```csharp
 protected override async Task OnInitializedAsync()
 {

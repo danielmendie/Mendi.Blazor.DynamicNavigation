@@ -42,6 +42,7 @@ namespace CountryApp
         public DataModule DataModule { get; set; } = default!;
         [Inject]
         public PageFlowRegistry PageFlowRegistry { get; set; } = default!;
+        [Inject] public IPageFlowNavigator Navigator { get; set; } = default!;
 
 
         protected void ShowNotification(string message, Severity severity)

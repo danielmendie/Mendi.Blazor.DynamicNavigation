@@ -19,8 +19,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\PageFlow.Blazor.CLI\PageFlow.Blazor.CLI.csproj" />
-    <ProjectReference Include="..\PageFlow.Blazor\PageFlow.Blazor.csproj" />
+    <ProjectReference Include="..\..\src\PageFlow.Blazor.CLI\PageFlow.Blazor.CLI.csproj" />
+    <ProjectReference Include="..\..\src\PageFlow.Blazor\PageFlow.Blazor.csproj" />
   </ItemGroup>
 
 </Project>

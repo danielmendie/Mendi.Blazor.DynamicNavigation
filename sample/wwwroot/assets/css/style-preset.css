@@ -5320,11 +5320,11 @@ h1, h2 {
     }
 
     [data-pc-theme=dark] .auth-main .auth-wrapper.v1 .auth-form, [data-pc-theme=dark] .soon-card-1 {
-        background:url(../images/client-bg.png) no-repeat 50%;
+        background: url(../images/client-bg.png) no-repeat 50%;
         background-size: cover;
     }
 
-    [data-pc-theme=dark] .pc-container {
+    [data-pc-theme=dark] .pc-container, [data-pc-theme=dark] .loader-container {
         background: url(../images/client-bg.png) no-repeat 50%;
         background-size: cover;
     }

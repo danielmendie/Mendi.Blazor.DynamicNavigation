@@ -3,15 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
 VisualStudioVersion = 18.1.11312.151
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PageFlow.Blazor", "PageFlow.Blazor\PageFlow.Blazor.csproj", "{80033E41-23C3-4019-8CE6-98C3D725113A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PageFlow.Blazor", "src\PageFlow.Blazor\PageFlow.Blazor.csproj", "{80033E41-23C3-4019-8CE6-98C3D725113A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PageFlow.Blazor.CLI", "PageFlow.Blazor.CLI\PageFlow.Blazor.CLI.csproj", "{EF5403CC-D854-4D88-8BA6-498534EF637E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PageFlow.Blazor.CLI", "src\PageFlow.Blazor.CLI\PageFlow.Blazor.CLI.csproj", "{EF5403CC-D854-4D88-8BA6-498534EF637E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PageFlow.Blazor.Tests", "PageFlow.Blazor.Tests\PageFlow.Blazor.Tests.csproj", "{FFA699A3-5E23-47AE-94E4-0D574DD5CBC8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PageFlow.Blazor.Tests", "tests\PageFlow.Blazor.Tests\PageFlow.Blazor.Tests.csproj", "{FFA699A3-5E23-47AE-94E4-0D574DD5CBC8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PageFlow.Blazor.Common", "PageFlow.Blazor.Common\PageFlow.Blazor.Common.csproj", "{4E9296A3-D8D1-473B-B7C4-BF7F724A228D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PageFlow.Blazor.Common", "src\PageFlow.Blazor.Common\PageFlow.Blazor.Common.csproj", "{4E9296A3-D8D1-473B-B7C4-BF7F724A228D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CountryApp", "SampleApp\CountryApp.csproj", "{336E5E74-4D83-4822-BFEA-925E93BDA294}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CountryApp", "sample\CountryApp.csproj", "{336E5E74-4D83-4822-BFEA-925E93BDA294}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_solution", "_solution", "{3F552BBC-D573-43FC-931F-45A84C08A52E}"
 	ProjectSection(SolutionItems) = preProject
